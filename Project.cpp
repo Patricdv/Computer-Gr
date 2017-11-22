@@ -2,7 +2,7 @@
 //// Componente Curricular: Computação Gráfica
 //// Docente: José Bins Filho
 //// Trabalho 1 – Labirinto
-//// Discentes: Matheus Henrique Trichez e Patric Dalcin Venturini  
+//// Discentes: Matheus Henrique Trichez e Patric Dalcin Venturini
 /////////////////////////////////////////
 
 #include <GL/glut.h>
@@ -18,7 +18,7 @@ const double pi = 3.1415926;
 GLdouble p[3] = {0, 0, 0};
 
 float robotWalkingUp = 0, robotWalkingSide = StartPosition;
-float cameraX = StartPosition, cameraZ = 12;
+float cameraX = StartPosition + 12, cameraZ = 0;
 int changeCamera = 1, cameraAngle = 10, legRotation = 0, changeWalking = 0, changeHeadMovement = 0, robotHeadAngle = 0, robotAngle = 0;
 
 int maze[MazeHeight][MazeWidth] = {
@@ -109,19 +109,40 @@ void drawRobotLegs() {
     gluQuadricNormals(quadric, GLU_SMOOTH);
 
     glPushMatrix();
-        glColor3f(0.2, 0.2, 0.2);
-        glTranslatef(0.0, 2.0, 0.0);
-        glRotatef(90, 1.0, 0.0, 0.0);
-
         glTranslatef(-0.5, 0, 0);
+        glRotatef(90, 1.0, 0.0, 0.0);
         glRotatef(-legRotation, 1.0, 0.0, 0.0);
-        gluCylinder(quadric, 0.3, 0.3, 2, 100, 100);
-        glRotatef(legRotation, 1.0, 0.0, 0.0);
+        glColor3f(0.2, 0.2, 0.2);
+        gluCylinder(quadric, 0.2, 0.2, 1.5, 100, 100);
 
-        glTranslatef(1, 0, 0);
+        glTranslatef(0, 0, 1.5);
+        glColor3f(0.8, 0.4, 0.4);
+        glutSolidTorus(0.2, 0.1, 100, 100);
+        glColor3f(0.0, 0.4, 0.4);
+        gluCylinder(quadric, 0.2, 0.2, 1.5, 100, 100);
 
+        glTranslatef(0, 0, 1.5);
+        glColor3f(0.8, 0.4, 0.4);
+        glutSolidTorus(0.2, 0.1, 100, 100);
+    glPopMatrix();
+
+
+    glPushMatrix();
+        glTranslatef(0.5, 0, 0);
+        glRotatef(90, 1.0, 0.0, 0.0);
         glRotatef(legRotation, 1.0, 0.0, 0.0);
-        gluCylinder(quadric, 0.3, 0.3, 2, 100, 100);
+        glColor3f(0.2, 0.2, 0.2);
+        gluCylinder(quadric, 0.2, 0.2, 1.5, 100, 100);
+
+        glTranslatef(0, 0, 1.5);
+        glColor3f(0.8, 0.4, 0.4);
+        glutSolidTorus(0.2, 0.1, 100, 100);
+        glColor3f(0.0, 0.4, 0.4);
+        gluCylinder(quadric, 0.2, 0.2, 1.5, 100, 100);
+
+        glTranslatef(0, 0, 1.5);
+        glColor3f(0.8, 0.4, 0.4);
+        glutSolidTorus(0.2, 0.1, 100, 100);
     glPopMatrix();
 }
 
@@ -133,61 +154,88 @@ void drawRobotArms() {
     gluQuadricNormals(quadric, GLU_SMOOTH);
 
     glPushMatrix();
-        glColor3f(0.2, 0.2, 0.2);
-        glTranslatef(0.0, 1.5, 0.0);
         glRotatef(90, 1.0, 0.0, 0.0);
 
-        glTranslatef(-1, 0, 0);
-        glRotatef(-20, 0.0, 1.0, 0.0);
-        glRotatef(legRotation, 1.0, 0.0, 0.0);
-        glutSolidSphere(0.3,100,100);
-        gluCylinder(quadric, 0.3, 0.3, 1.5, 100, 100);
-        glRotatef(-legRotation, 1.0, 0.0, 0.0);
-        glRotatef(20, 0.0, 1.0, 0.0);
+        glPushMatrix();
+          glTranslatef(-1, 0, 0);
+          glRotatef(-20, 0.0, 1.0, 0.0);
+          glRotatef(legRotation, 1.0, 0.0, 0.0);
 
-        glTranslatef(2, 0, 0);
-        glRotatef(20, 0.0, 1.0, 0.0);
-        glRotatef(-legRotation, 1.0, 0.0, 0.0);
-        glutSolidSphere(0.3,100,100);
-        gluCylinder(quadric, 0.3, 0.3, 1.5, 100, 100);
+          glColor3f(0.2, 0.2, 0.2);
+          glutSolidSphere(0.3, 100,   100);
+          glColor3f(0.6, 0.8, 0.6);
+          gluCylinder(quadric, 0.1, 0.1, 1, 100, 100);
+
+          glTranslatef(0, 0, 1);
+          glColor3f(0.2, 0.2, 0.2);
+          glutSolidSphere(0.3, 100, 100);
+          glColor3f(0.6, 0.8, 0.6);
+          gluCylinder(quadric, 0.2, 0.2, 1, 100, 100);
+        glPopMatrix();
+
+        glPushMatrix();
+          glTranslatef(1, 0, 0);
+          glRotatef(20, 0.0, 1.0, 0.0);
+          glRotatef(-legRotation, 1.0, 0.0, 0.0);
+
+          glColor3f(0.2, 0.2, 0.2);
+          glutSolidSphere(0.3, 100, 100);
+          glColor3f(0.6, 1.0, 0.6);
+          gluCylinder(quadric, 0.1, 0.1, 1, 100, 100);
+
+          glTranslatef(0, 0, 1);
+          glColor3f(0.2, 0.2, 0.2);
+          glutSolidSphere(0.3, 100, 100);
+          glColor3f(0.6, 0.8, 0.6);
+          gluCylinder(quadric, 0.2, 0.2, 1, 100, 100);
+        glPopMatrix();
     glPopMatrix();
 }
 
 void drawRobotBody() {
-    glColor3f(0.4, 0.4, 0.4);
+    GLUquadricObj * quadric = gluNewQuadric();
 
-    glBegin(GL_QUADS);
-        glVertex3fv(robotBody[0]); //frente
-        glVertex3fv(robotBody[1]);
-        glVertex3fv(robotBody[2]);
-        glVertex3fv(robotBody[3]);
+    gluQuadricDrawStyle(quadric, GLU_FILL);
+    gluQuadricOrientation(quadric, GLU_OUTSIDE);
+    gluQuadricNormals(quadric, GLU_SMOOTH);
 
-        glVertex3fv(robotBody[4]); // fundos
-        glVertex3fv(robotBody[5]);
-        glVertex3fv(robotBody[6]);
-        glVertex3fv(robotBody[7]);
+    glPushMatrix();
+        glColor3f(0.0, 0.2, 0.9);
+        glutSolidSphere(1, 100, 100);
+    glPopMatrix();
 
-        glColor3f(0.3, 0.3, 0.3);
-        glVertex3fv(robotBody[0]); // esq
-        glVertex3fv(robotBody[3]);
-        glVertex3fv(robotBody[6]);
-        glVertex3fv(robotBody[5]);
+    glTranslatef(0.0f, 1.5f, 0.0f);
+    glPushMatrix();
+        glColor3f(0.4, 0.4, 0.4);
+        glRotatef(90, 1, 0, 0);
+        glutSolidCone(0.5, 2, 20, 20);
+    glPopMatrix();
 
-        glVertex3fv(robotBody[3]); // topo
-        glVertex3fv(robotBody[2]);
-        glVertex3fv(robotBody[7]);
-        glVertex3fv(robotBody[6]);
+    glTranslatef(0.0f, 0.5f, 0.0f);
+    glPushMatrix();
+        glColor3f(0.0, 0.2, 0.9);
+        glutSolidSphere(0.8, 100, 100);
+    glPopMatrix();
 
-        glVertex3fv(robotBody[1]); // dir
-        glVertex3fv(robotBody[4]);
-        glVertex3fv(robotBody[7]);
-        glVertex3fv(robotBody[2]);
+    glTranslatef(0.0f, 0.4f, 0.5f);
 
-        glVertex3fv(robotBody[1]); // base
-        glVertex3fv(robotBody[0]);
-        glVertex3fv(robotBody[5]);
-        glVertex3fv(robotBody[4]);
-    glEnd();
+    glPushMatrix();
+        glTranslatef(0.25f, 0.0f, 0.0f);
+        glRotatef(50, 1, 0, 0);
+
+        glColor3f(0.8, 0.3, 0.4);
+        gluCylinder(quadric, 0.1, 0.2, 0.8, 100, 100);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(-0.25f, 0.0f, 0.0f);
+        glRotatef(50, 1, 0, 0);
+
+        glColor3f(0.8, 0.3, 0.4);
+        gluCylinder(quadric, 0.1, 0.2, 0.8, 100, 100);
+    glPopMatrix();
+
+    glTranslatef(0.0f, 0.0f, -0.5f);
 }
 
 void drawRobotHead() {
@@ -276,14 +324,13 @@ void drawRobotHead() {
 void drawRobot() {
     glRotatef(robotAngle, 0.0, 1.0, 0.0);
 
+    glTranslatef(0.0, 3.2, 0.0);
     drawRobotLegs();
-
-    glTranslatef(0.0, 2.0, 0.0);
     drawRobotBody();
-
     drawRobotArms();
 
-    glTranslatef(0.0, 3.0, 0.0);
+    glutSolidTorus(0.4, 0.5, 100, 100);
+    glTranslatef(0.0, 1.3, 0.0);
     drawRobotHead();
 
     if (changeWalking == 0) {
