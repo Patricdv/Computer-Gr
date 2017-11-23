@@ -1,7 +1,7 @@
 /////////////////////////////////////////
 //// Componente Curricular: Computação Gráfica
 //// Docente: José Bins Filho
-//// Trabalho 1 – Labirinto
+//// Trabalho 2 – Labirinto Com Iluminação, NURBS e Transparência
 //// Discentes: Matheus Henrique Trichez e Patric Dalcin Venturini
 /////////////////////////////////////////
 
@@ -41,63 +41,45 @@ GLfloat robotEyes[8][3] = { {-0.5, 0.0, -0.5}, {0.5, 0.0, -0.5}, {0.5, 0.5, -0.5
                             {0.5, 0.0, 0.2} , {-0.5, 0.0, 0.2}, {-0.5, 0.5, 0.2}, {0.5, 0.5, 0.2}};
 
 void drawCube(float size) {
-    size = size / 2;
+    glColor3f(0.48, 0.80, 0.12);
+    glutSolidCube(size);
+}
 
-    glBegin(GL_QUADS);
-        // TRASEIRA
-        glColor3f(0.28, 0.20, 0.0);
-        glVertex3f(size, -size, size);
-        glVertex3f(size,  size, size);
-        glVertex3f(-size,  size, size);
-        glVertex3f(-size, -size, size);
+GLvoid CalculateVectorNormal(GLfloat fVert1[], GLfloat fVert2[], GLfloat fVert3[], GLfloat *fNormalX, GLfloat *fNormalY, GLfloat *fNormalZ) {
+    GLfloat Qx, Qy, Qz, Px, Py, Pz;
 
-        // FRENTE
-        glColor3f(0.12, 0.08, 0.0);
-        glVertex3f(size, -size, -size);
-        glVertex3f(size, size, -size);
-        glVertex3f(-size, size, -size);
-        glVertex3f(-size, -size, -size);
+    Qx = fVert2[0]-fVert1[0];
+    Qy = fVert2[1]-fVert1[1];
+    Qz = fVert2[2]-fVert1[2];
+    Px = fVert3[0]-fVert1[0];
+    Py = fVert3[1]-fVert1[1];
+    Pz = fVert3[2]-fVert1[2];
 
-        // DIREITA
-        glColor3f(0.20, 0.14, 0.0);
-        glVertex3f(size, -size, -size);
-        glVertex3f(size, size, -size);
-        glVertex3f(size, size, size);
-        glVertex3f(size, -size, size);
-
-        // ESQUERDA
-        glColor3f(0.22, 0.17, 0.0);
-        glVertex3f(-size, -size, size);
-        glVertex3f(-size, size, size);
-        glVertex3f(-size, size, -size);
-        glVertex3f(-size, -size, -size);
-
-        // TOPO
-        glColor3f(0.18, 0.10, 0.0);
-        glVertex3f(size, size, size);
-        glVertex3f(size, size, -size);
-        glVertex3f(-size, size, -size);
-        glVertex3f(-size, size, size);
-
-        // BASE
-        glColor3f(0.28, 0.20, 0.0);
-        glVertex3f(size, -size, -size);
-        glVertex3f(size, -size, size);
-        glVertex3f(-size, -size, size);
-        glVertex3f(-size, -size, -size);
-    glEnd();
+    *fNormalX = Py*Qz - Pz*Qy;
+    *fNormalY = Pz*Qx - Px*Qz;
+    *fNormalZ = Px*Qy - Py*Qx;
 }
 
 void drawFloor(float size) {
     size = size / 2;
+    GLfloat fNormalX, fNormalY, fNormalZ;
+    GLfloat fVert1[3] = {-size, -size, -size};
+    GLfloat fVert2[3] = {-size, -size, size};
+    GLfloat fVert3[3] = {size, -size, size};
 
     glBegin(GL_QUADS);
-        glColor3f(0.14, 0.08, 0.0);
+        glColor3f(0.34, 0.48, 0.3);
 
         glVertex3f(size, -size, -size);
         glVertex3f(size, -size, size);
         glVertex3f(-size, -size, size);
         glVertex3f(-size, -size, -size);
+
+        // Calculate the vector normal coming out of the 3D polygon.
+        CalculateVectorNormal(fVert1, fVert2, fVert3, &fNormalX, &fNormalY, &fNormalZ);
+
+        // Set the normal vector for the polygon
+        glNormal3f(fNormalX, fNormalY, fNormalZ);
     glEnd();
 }
 
@@ -248,54 +230,29 @@ void drawRobotHead() {
     glRotatef(robotHeadAngle, 0.0, 1.0, 0.0);
 
     glColor3f(0.4, 0.4, 0.4);
-    glutSolidSphere(1, 100, 100);
+    glPushMatrix();
+        glRotatef(90, 1.0, 0.0, 0.0);
+        gluCylinder(quadric, 0.5, 0.5, 1, 100, 100);
+    glPopMatrix();
+
+    glutSolidSphere(0.5, 100, 100);
 
     glPushMatrix();
-        glTranslatef(0, 0.2,-0.5);
-        glColor3f(0.2, 0.2, 0.2);
-        glBegin(GL_QUADS);
-            glVertex3fv(robotEyes[0]); //frente
-            glVertex3fv(robotEyes[1]);
-            glVertex3fv(robotEyes[2]);
-            glVertex3fv(robotEyes[3]);
-
-            glVertex3fv(robotEyes[4]); // fundos
-            glVertex3fv(robotEyes[5]);
-            glVertex3fv(robotEyes[6]);
-            glVertex3fv(robotEyes[7]);
-
-            glVertex3fv(robotEyes[0]); // esq
-            glVertex3fv(robotEyes[3]);
-            glVertex3fv(robotEyes[6]);
-            glVertex3fv(robotEyes[5]);
-
-            glVertex3fv(robotEyes[3]); // topo
-            glVertex3fv(robotEyes[2]);
-            glVertex3fv(robotEyes[7]);
-            glVertex3fv(robotEyes[6]);
-
-            glVertex3fv(robotEyes[1]); // dir
-            glVertex3fv(robotEyes[4]);
-            glVertex3fv(robotEyes[7]);
-            glVertex3fv(robotEyes[2]);
-
-            glVertex3fv(robotEyes[1]); // base
-            glVertex3fv(robotEyes[0]);
-            glVertex3fv(robotEyes[5]);
-            glVertex3fv(robotEyes[4]);
-        glEnd();
+        glTranslatef(0, 0.1,-0.35);
+        glColor3f(0.3, 0.3, 0.3);
+        glutSolidCube(0.4);
 
         glBegin(GL_QUADS);
-            glColor3f(1.0, 0.0, 0.0);
+            glColor3f(1.0, 0.8, 0.4);
 
-            glVertex3f(0.3, 0.1, -0.501); //Olhos
-            glVertex3f(-0.3, 0.1, -0.501);
-            glVertex3f(-0.3, 0.4, -0.501);
-            glVertex3f(0.3, 0.4, -0.501);
+            glVertex3f(0.15, -0.15, -0.201);
+            glVertex3f(-0.15, -0.15, -0.201);
+            glVertex3f(-0.15, 0.15, -0.201);
+            glVertex3f(0.15, 0.15, -0.201);
         glEnd();
     glPopMatrix();
 
-    glTranslatef(0.0f, 0.9f, 0.0f);
+    glTranslatef(0.0f, 0.4f, 0.0f);
     glRotatef(-90, 1, 0, 0);
     glColor3f(0.3, 0.3, 0.3);
     glutSolidCone(0.1, 0.8, 20, 20);
@@ -566,6 +523,33 @@ void keyPressed(unsigned char key, int x, int y) {
 
 // Start rendering params
 void start(void) {
+    ////////////////////////////////////////////////
+    /////////////////  Enable light ////////////////
+    ////////////////////////////////////////////////
+    GLfloat ambientLight[] = {0.2, 0.2, 0.2, 1.0};
+    GLfloat diffuseLight[] = {0.8, 0.8, 0.8, 1.0};
+    GLfloat specularLight[] = { 0.7, 0.7, 0.7, 1.0};
+    GLfloat lightPosition[] = {0, 50, 50, 1.0};
+    GLfloat especularity[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLint materialEspecularity = 10;
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_COLOR_MATERIAL);
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, especularity);
+    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, materialEspecularity);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight);
+    glLightfv(GL_LIGHT1, GL_POSITION, lightPosition);
+
+    glEnable(GL_LIGHT1);
+    /////////////////////////////////////////////////
+
+
     // Define a cor de fundo da janela de visualização como preta
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
