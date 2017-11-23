@@ -18,7 +18,7 @@ const double pi = 3.1415926;
 GLdouble p[3] = {0, 0, 0};
 
 float robotWalkingUp = 0, robotWalkingSide = StartPosition;
-float cameraX = StartPosition + 12, cameraZ = 0;
+float cameraX = StartPosition, cameraZ = 12;
 int changeCamera = 1, cameraAngle = 10, legRotation = 0, changeWalking = 0, changeHeadMovement = 0, robotHeadAngle = 0, robotAngle = 0;
 
 int maze[MazeHeight][MazeWidth] = {
@@ -60,20 +60,20 @@ GLvoid CalculateVectorNormal(GLfloat fVert1[], GLfloat fVert2[], GLfloat fVert3[
     *fNormalZ = Px*Qy - Py*Qx;
 }
 
-void drawFloor(float size) {
-    size = size / 2;
+void drawFloor() {
+    float size = 500 / 2;
     GLfloat fNormalX, fNormalY, fNormalZ;
-    GLfloat fVert1[3] = {-size, -size, -size};
-    GLfloat fVert2[3] = {-size, -size, size};
-    GLfloat fVert3[3] = {size, -size, size};
+    GLfloat fVert1[3] = {-size, 0, size};
+    GLfloat fVert2[3] = {size, 0, size};
+    GLfloat fVert3[3] = {size, 0, size};
 
     glBegin(GL_QUADS);
         glColor3f(0.34, 0.48, 0.3);
 
-        glVertex3f(size, -size, -size);
-        glVertex3f(size, -size, size);
-        glVertex3f(-size, -size, size);
-        glVertex3f(-size, -size, -size);
+        glVertex3f(size, 0, -size);
+        glVertex3f(size, 0, size);
+        glVertex3f(-size, 0, size);
+        glVertex3f(-size, 0, -size);
 
         // Calculate the vector normal coming out of the 3D polygon.
         CalculateVectorNormal(fVert1, fVert2, fVert3, &fNormalX, &fNormalY, &fNormalZ);
@@ -384,6 +384,10 @@ void drawFountain() {
     glPopMatrix();
 }
 
+void drawWindowWall() {
+
+}
+
 void draw(void) {
     int i, j, positionX, positionY;
 
@@ -391,13 +395,18 @@ void draw(void) {
     glLoadIdentity();
 
     if (changeCamera == 1) {
-		gluLookAt(robotWalkingSide,110 + cameraAngle,robotWalkingUp+50, robotWalkingSide,0,robotWalkingUp, 0,1,0);
-	} else {
+  		  gluLookAt(robotWalkingSide,110 + cameraAngle,robotWalkingUp+50, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+  	} else if (changeCamera == 2) {
+        gluLookAt(cameraX,20 + cameraAngle,cameraZ, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+    } else if (changeCamera == 3) {
+        gluLookAt(cameraX,20 + cameraAngle,cameraZ, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+    } else if (changeCamera == 4) {
         gluLookAt(cameraX,20 + cameraAngle,cameraZ, robotWalkingSide,0,robotWalkingUp, 0,1,0);
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    drawFloor();
     glTranslatef(0.0, Scale/2, 0.0);
     for (i = 0; i < MazeWidth; i++) {
         for (j = 0; j < MazeHeight; j++) {
@@ -412,14 +421,12 @@ void draw(void) {
                 glPushMatrix();
                     positionX = -i;
                     positionY = j - (MazeHeight / 2);
-                    glTranslatef(positionY*Scale, 0, positionX*Scale);
-                    drawFloor(Scale);
                     if (i == 1 && j == 1) {
-                        glTranslatef(0.0, -Scale/2, 0.0);
+                        glTranslatef(positionY*Scale, -Scale/2, positionX*Scale);
                         drawTable();
                     }
                     if (i == 5 && j == 2) {
-                        glTranslatef(0.0, -Scale/2, 0.0);
+                        glTranslatef(positionY*Scale, -Scale/2, positionX*Scale);
                         glColor3f(0.0,0.0,0.0);
                         drawFountain();
                     }
@@ -510,8 +517,8 @@ void redraw(int) {
 
 void keyPressed(unsigned char key, int x, int y) {
 	if (key == 'c') {
-        cameraAngle = 0;
-		changeCamera = (changeCamera) ? 0 : 1;
+    cameraAngle = 0;
+		changeCamera = (changeCamera != 4) ? (changeCamera++) : 1;
     } else if (key == '+') {
         cameraAngle -= 1;
     } else if (key == '-') {
@@ -529,7 +536,7 @@ void start(void) {
     GLfloat ambientLight[] = {0.2, 0.2, 0.2, 1.0};
     GLfloat diffuseLight[] = {0.8, 0.8, 0.8, 1.0};
     GLfloat specularLight[] = { 0.7, 0.7, 0.7, 1.0};
-    GLfloat lightPosition[] = {0, 50, 50, 1.0};
+    GLfloat lightPosition[] = { 12, 10, 12, 1.0 };
     GLfloat especularity[] = {1.0f, 1.0f, 1.0f, 1.0f};
     GLint materialEspecularity = 10;
 
