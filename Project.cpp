@@ -1,9 +1,10 @@
-/////////////////////////////////////////
-//// Componente Curricular: Computação Gráfica
-//// Docente: José Bins Filho
-//// Trabalho 2 – Labirinto Com Iluminação, NURBS e Transparência
-//// Discentes: Matheus Henrique Trichez e Patric Dalcin Venturini
-/////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+///////////// Componente Curricular: Computação Gráfica /////////////////
+/////////////////////////////////////////////////////////////////////////
+//// Docente: José Bins Filho                                        ////
+//// Trabalho 2 – Labirinto Com Iluminação, NURBS e Transparência    ////
+//// Discentes: Matheus Henrique Trichez e Patric Dalcin Venturini   ////
+/////////////////////////////////////////////////////////////////////////
 
 #include <GL/glut.h>
 #include <GL/glu.h>
@@ -25,12 +26,12 @@ int maze[MazeHeight][MazeWidth] = {
         {1, 1, 1, 1, 1, 1, 1, 0, 1, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 0, 1, 1, 0, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 1, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
         {1, 1, 0, 1, 1, 1, 0, 1, 1, 1},
         {1, 1, 0, 1, 1, 1, 0, 1, 1, 1},
         {1, 1, 1, 1, 0, 0, 0, 0, 1, 1},
         {1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 0, 0, 0, 1, 1},
+        {1, 1, 1, 1, 1, 0, 0, 0, 0, 1},
         {1, 1, 1, 1, 1, 0, 1, 1, 1, 1}
 };
 
@@ -45,42 +46,41 @@ void drawCube(float size) {
     glutSolidCube(size);
 }
 
-GLvoid CalculateVectorNormal(GLfloat fVert1[], GLfloat fVert2[], GLfloat fVert3[], GLfloat *fNormalX, GLfloat *fNormalY, GLfloat *fNormalZ) {
-    GLfloat Qx, Qy, Qz, Px, Py, Pz;
-
-    Qx = fVert2[0]-fVert1[0];
-    Qy = fVert2[1]-fVert1[1];
-    Qz = fVert2[2]-fVert1[2];
-    Px = fVert3[0]-fVert1[0];
-    Py = fVert3[1]-fVert1[1];
-    Pz = fVert3[2]-fVert1[2];
-
-    *fNormalX = Py*Qz - Pz*Qy;
-    *fNormalY = Pz*Qx - Px*Qz;
-    *fNormalZ = Px*Qy - Py*Qx;
-}
-
 void drawFloor() {
     float size = 500 / 2;
-    GLfloat fNormalX, fNormalY, fNormalZ;
-    GLfloat fVert1[3] = {-size, 0, size};
-    GLfloat fVert2[3] = {size, 0, size};
-    GLfloat fVert3[3] = {size, 0, size};
 
-    glBegin(GL_QUADS);
-        glColor3f(0.34, 0.48, 0.3);
+    GLUquadricObj * quadric = gluNewQuadric();
 
-        glVertex3f(size, 0, -size);
-        glVertex3f(size, 0, size);
-        glVertex3f(-size, 0, size);
-        glVertex3f(-size, 0, -size);
+    gluQuadricDrawStyle(quadric, GLU_FILL);
+    gluQuadricOrientation(quadric, GLU_OUTSIDE);
+    gluQuadricNormals(quadric, GLU_SMOOTH);
 
-        // Calculate the vector normal coming out of the 3D polygon.
-        CalculateVectorNormal(fVert1, fVert2, fVert3, &fNormalX, &fNormalY, &fNormalZ);
+    glPushMatrix();
+        glRotatef(-90, 1.0, 0.0, 0.0);
+        gluDisk(quadric, 0, size, 100, 100);
+    glPopMatrix();
+}
 
-        // Set the normal vector for the polygon
-        glNormal3f(fNormalX, fNormalY, fNormalZ);
-    glEnd();
+void drawWindowedWall(float size) {
+    float brickSize = size/4;
+    int i, j;
+
+    glPushMatrix();
+        glTranslatef((size/2 - brickSize/2), brickSize/2, (-size/2 + brickSize/2));
+        for(i = 0; i<=3; i++) {
+            for(j = 0; j<=3; j++) {
+                glPushMatrix();
+                    if((i == 0 || i == 3) || (j == 0 || j == 3)) {
+                        glColor3f(0.0f, 0.0f, 0.0f);
+                    } else {
+                        glColor4f(0.5f, 0.8f, 0.1f, 0.15f);
+                    }
+                    glTranslatef(0, brickSize*i, brickSize*j);
+                    glutSolidCube(brickSize);
+                glPopMatrix();
+            }
+        }
+    glPopMatrix();
 }
 
 void drawRobotLegs() {
@@ -96,7 +96,6 @@ void drawRobotLegs() {
         glRotatef(-legRotation, 1.0, 0.0, 0.0);
         glColor3f(0.2, 0.2, 0.2);
         gluCylinder(quadric, 0.2, 0.2, 1.5, 100, 100);
-
         glTranslatef(0, 0, 1.5);
         glColor3f(0.8, 0.4, 0.4);
         glutSolidTorus(0.2, 0.1, 100, 100);
@@ -107,7 +106,6 @@ void drawRobotLegs() {
         glColor3f(0.8, 0.4, 0.4);
         glutSolidTorus(0.2, 0.1, 100, 100);
     glPopMatrix();
-
 
     glPushMatrix();
         glTranslatef(0.5, 0, 0);
@@ -384,10 +382,6 @@ void drawFountain() {
     glPopMatrix();
 }
 
-void drawWindowWall() {
-
-}
-
 void draw(void) {
     int i, j, positionX, positionY;
 
@@ -429,6 +423,12 @@ void draw(void) {
                         glTranslatef(positionY*Scale, -Scale/2, positionX*Scale);
                         glColor3f(0.0,0.0,0.0);
                         drawFountain();
+                    }
+
+                    if (i == 3 && j == 9) {
+                        glTranslatef(positionY*Scale, -Scale/2, positionX*Scale);
+                        glColor3f(0.0,0.0,0.0);
+                        drawWindowedWall(Scale);
                     }
                 glPopMatrix();
             }
@@ -518,12 +518,16 @@ void redraw(int) {
 void keyPressed(unsigned char key, int x, int y) {
 	if (key == 'c') {
     cameraAngle = 0;
-		changeCamera = (changeCamera != 4) ? (changeCamera++) : 1;
-    } else if (key == '+') {
-        cameraAngle -= 1;
-    } else if (key == '-') {
-        cameraAngle += 1;
+		changeCamera++;
+    if (changeCamera == 5) {
+      changeCamera = 1;
     }
+
+  } else if (key == '+') {
+    cameraAngle -= 1;
+  } else if (key == '-') {
+    cameraAngle += 1;
+  }
 
 //	glutPostRedisplay();
 }
