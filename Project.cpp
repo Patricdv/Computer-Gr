@@ -38,8 +38,38 @@ int maze[MazeHeight][MazeWidth] = {
 GLfloat robotBody[8][3] = { {-1, 0, -1}, {1, 0, -1}, {1, 2, -1}, {-1, 2, -1},
                             {1, 0, 1}, {-1, 0, 1}, {-1, 2, 1}, {1, 2, 1} };
 
-GLfloat robotEyes[8][3] = { {-0.5, 0.0, -0.5}, {0.5, 0.0, -0.5}, {0.5, 0.5, -0.5}, {-0.5, 0.5, -0.5},
-                            {0.5, 0.0, 0.2} , {-0.5, 0.0, 0.2}, {-0.5, 0.5, 0.2}, {0.5, 0.5, 0.2}};
+GLfloat tableFoots[4][4][3] = {
+        { { 0.0, 0.0, 0.0 },{ 1.0, 1.3, 0.0 },{ -1.5, 2.9, 0.0 },{ 0.1, 4.0, 0.0 } },
+        { { 0.5, 0.0, 0.0 },{ 1.5, 1.3, 0.0 },{ -1.0, 2.9, 0.0 },{ 0.55, 4.0, 0.0 } },
+        { { 0.25, 0.0, 0.5 },{ 1.25, 1.3, 0.5 },{ -1.25, 2.9, 0.5 },{ 0.3, 4.0, 0.5 } },
+        { { 0.0, 0.0, 0.0 },{ 1.0, 1.3, 0.0 },{ -1.5, 2.9, 0.0 },{ 0.1, 4.0, 0.0 } }
+};
+
+GLfloat postCtrlPoints[4][4][3] = {
+        { { 0.0, 0.0, 0.0 },{ 2.0, 2.0, 0.0 },{ -2.5, 3.2, 0.0 },{ -3.8, 1.45, 0.0 } },
+        { { 0.8, 0.0, 0.6 },{ 2.8, 2.0, 0.6 },{ -1.7, 3.2, 0.6 },{ -3.0, 1.45, 0.6 } },
+        { { 0.8, 0.0, -0.6 },{ 2.8, 2.0, -0.6 },{ -1.7, 3.2, -0.6 },{ -3.0, 1.45, -0.6 } },
+        { { 0.0, 0.0, 0.0 },{ 2.0, 2.0, 0.0 },{ -2.5, 3.2, 0.0 },{ -3.8, 1.45, 0.0 } }
+};
+
+void nurbs(GLfloat cp[4][4][3], GLint un, GLint vn) {
+    int u, v;
+
+    glMap2f(GL_MAP2_VERTEX_3, 0, 1, 12, 4, 0, 1, 3, 4, &cp[0][0][0]);
+    glEnable(GL_MAP2_VERTEX_3);
+    glEnable(GL_AUTO_NORMAL);
+
+    glBegin(GL_QUADS);
+        for (u = 0; u < un; u++) {
+            for (v = 0; v < vn; v++) {
+                glEvalCoord2f((GLfloat)v / vn, (GLfloat)(u+1) / un);
+                glEvalCoord2f((GLfloat)(v+1) / vn, (GLfloat)(u+1) / un);
+                glEvalCoord2f((GLfloat)(v+1) / vn, (GLfloat)u / un);
+                glEvalCoord2f((GLfloat)v / vn, (GLfloat)u / un);
+            }
+        }
+    glEnd();
+}
 
 void drawCube(float size) {
     glColor3f(0.48, 0.80, 0.12);
@@ -61,9 +91,54 @@ void drawFloor() {
     glPopMatrix();
 }
 
+void drawPost() {
+    GLUquadricObj * quadric = gluNewQuadric();
+
+    gluQuadricDrawStyle(quadric, GLU_FILL);
+    gluQuadricOrientation(quadric, GLU_OUTSIDE);
+    gluQuadricNormals(quadric, GLU_SMOOTH);
+
+    glTranslatef(0, 0, 2.0f);
+
+    glPushMatrix();
+        glRotatef(-90, 1, 0, 0);
+        gluCylinder(quadric, 0.3, 0.3, 8, 100, 100);
+    glPopMatrix();
+
+    glTranslatef(0, 8, 0);
+    glPushMatrix();
+        glColor3f(0.35, 0.30, 0.0);
+        glRotatef(-90, 1, 0, 0);
+        gluDisk(quadric, 0, 0.5, 100, 100);
+    glPopMatrix();
+
+    glTranslatef(-0.2, 0, -0.2);
+    glRotatef(-45, 0, 1, 0);
+    nurbs(postCtrlPoints, 30, 30);
+
+    glTranslatef(-3.2, 1, 0);
+    glPushMatrix();
+        glColor3f(0.75, 0.30, 0.5);
+        glRotatef(-90, 1, 0, 0);
+        glutSolidCone(2, 0.8, 100, 100);
+    glPopMatrix();
+}
+
+void drawBearAndPost() {
+    //Draw of the post aside of the bear
+    drawPost();
+
+    // drawBear nurbs(postCtrlPoints, 30, 30);
+}
+
 void drawWindowedWall(float size) {
     float brickSize = size/4;
     int i, j;
+
+    glPushMatrix();
+        glTranslatef(8*Scale, 0, 0);
+        drawBearAndPost();
+    glPopMatrix();
 
     glPushMatrix();
         glTranslatef((size/2 - brickSize/2), brickSize/2, (-size/2 + brickSize/2));
@@ -71,10 +146,18 @@ void drawWindowedWall(float size) {
             for(j = 0; j<=3; j++) {
                 glPushMatrix();
                     if((i == 0 || i == 3) || (j == 0 || j == 3)) {
+                        glTranslatef(0, brickSize*i, brickSize*j);
                         glColor3f(0.0f, 0.0f, 0.0f);
-                    } else {
-                        glColor4f(0.5f, 0.8f, 0.1f, 0.15f);
+                        glutSolidCube(brickSize);
                     }
+                glPopMatrix();
+            }
+        }
+
+        for(i = 1; i<=2; i++) {
+            for(j = 1; j<=2; j++) {
+                glPushMatrix();
+                    glColor4f(0.5f, 0.8f, 0.1f, 0.15f);
                     glTranslatef(0, brickSize*i, brickSize*j);
                     glutSolidCube(brickSize);
                 glPopMatrix();
@@ -106,6 +189,8 @@ void drawRobotLegs() {
         glColor3f(0.8, 0.4, 0.4);
         glutSolidTorus(0.2, 0.1, 100, 100);
     glPopMatrix();
+
+    // Acrescentar as pernas
 
     glPushMatrix();
         glTranslatef(0.5, 0, 0);
@@ -313,28 +398,42 @@ void drawTable() {
     glPushMatrix();
         glColor3f(0.18, 0.10, 0.0);
 
-        glRotatef(-90, 1, 0, 0);
-        glTranslatef(1, 1, 0);
-        gluCylinder(quadric, 0.2, 0.2, 3, 100, 100);
-        glTranslatef(0, -2, 0);
-        gluCylinder(quadric, 0.2, 0.2, 3, 100, 100);
+        glTranslatef(1, 0, 1);
+        glPushMatrix();
+            glRotatef(135, 0, 1, 0);
+            nurbs(tableFoots, 30, 30);
+        glPopMatrix();
+
+        glTranslatef(0, 0, -2);
+        glPushMatrix();
+            glRotatef(45, 0, 1, 0);
+            nurbs(tableFoots, 30, 30);
+        glPopMatrix();
+
         glTranslatef(-2, 0, 0);
-        gluCylinder(quadric, 0.2, 0.2, 3, 100, 100);
-        glTranslatef(0, 2, 0);
-        gluCylinder(quadric, 0.2, 0.2, 3, 100, 100);
+        glPushMatrix();
+            glRotatef(-45, 0, 1, 0);
+            nurbs(tableFoots, 30, 30);
+        glPopMatrix();
+
+        glTranslatef(0, 0, 2);
+        glPushMatrix();
+            glRotatef(-135, 0, 1, 0);
+            nurbs(tableFoots, 30, 30);
+        glPopMatrix();
     glPopMatrix();
 
-    glTranslatef(0.0, 3.0, 0.0);
+    glTranslatef(0.0, 4.0, 0.0);
     glRotatef(90, 1, 0, 0);
 
     glColor3f(0.30, 0.27, 0.0);
     gluDisk(quadric, 0.0, 1.0, 100, 100);
 
     glColor3f(0.35, 0.30, 0.0);
-    gluDisk(quadric, 1, 2, 100, 100);
+    gluDisk(quadric, 1, 2.5, 100, 100);
 
     glRotatef(-90, 1, 0, 0);
-    glTranslatef(0.0, 1, 0.0);
+    glTranslatef(0.0, 0.8, 0.0);
     glColor3f(0.8, 0.8, 0.2);
     glutSolidTeapot(1);
 }
@@ -389,13 +488,15 @@ void draw(void) {
     glLoadIdentity();
 
     if (changeCamera == 1) {
-  		  gluLookAt(robotWalkingSide,110 + cameraAngle,robotWalkingUp+50, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+        gluLookAt(robotWalkingSide,110 + cameraAngle,robotWalkingUp+50, robotWalkingSide,0,robotWalkingUp, 0,1,0);
   	} else if (changeCamera == 2) {
         gluLookAt(cameraX,20 + cameraAngle,cameraZ, robotWalkingSide,0,robotWalkingUp, 0,1,0);
     } else if (changeCamera == 3) {
-        gluLookAt(cameraX,20 + cameraAngle,cameraZ, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+        gluLookAt(-2*Scale,10 + cameraAngle,-Scale + 1, -4*Scale,4,-Scale, 0,1,0);
     } else if (changeCamera == 4) {
-        gluLookAt(cameraX,20 + cameraAngle,cameraZ, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+        gluLookAt(-3*Scale,6 + cameraAngle,-3*Scale, -3*Scale,4,-5*Scale, 0,1,0);
+    } else if (changeCamera == 5) {
+        gluLookAt(3*Scale,3 + cameraAngle,-3*Scale, 4*Scale,3,-3*Scale, 0,1,0);
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -517,19 +618,17 @@ void redraw(int) {
 
 void keyPressed(unsigned char key, int x, int y) {
 	if (key == 'c') {
-    cameraAngle = 0;
+        cameraAngle = 0;
 		changeCamera++;
-    if (changeCamera == 5) {
-      changeCamera = 1;
+        if (changeCamera == 6) {
+            changeCamera = 1;
+        }
+    } else if (key == '+') {
+        cameraAngle -= 1;
+    } else if (key == '-') {
+        cameraAngle += 1;
     }
-
-  } else if (key == '+') {
-    cameraAngle -= 1;
-  } else if (key == '-') {
-    cameraAngle += 1;
-  }
-
-//	glutPostRedisplay();
+    //	glutPostRedisplay();
 }
 
 // Start rendering params
@@ -564,6 +663,8 @@ void start(void) {
     // Define a cor de fundo da janela de visualização como preta
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 // Callback function of window size alteration
