@@ -20,7 +20,7 @@ GLdouble p[3] = {0, 0, 0};
 
 float robotWalkingUp = 0, robotWalkingSide = StartPosition;
 float cameraX = StartPosition, cameraZ = 12;
-int changeCamera = 1, cameraAngle = 10, legRotation = 0, changeWalking = 0, changeHeadMovement = 0, robotHeadAngle = 0, robotAngle = 0;
+int changeCamera = 0, cameraAngle = 10, legRotation = 0, changeWalking = 0, changeHeadMovement = 0, robotHeadAngle = 0, robotAngle = 0;
 
 int maze[MazeHeight][MazeWidth] = {
         {1, 1, 1, 1, 1, 1, 1, 0, 1, 1},
@@ -125,8 +125,31 @@ void drawPost() {
 }
 
 void drawBear() {
+    GLUquadricObj * quadric = gluNewQuadric();
+
+    gluQuadricDrawStyle(quadric, GLU_FILL);
+    gluQuadricOrientation(quadric, GLU_OUTSIDE);
+    gluQuadricNormals(quadric, GLU_SMOOTH);
+
     glPushMatrix();
-        glutSolidSphere(1, 100, 100);
+        glTranslatef(0.0, 0.1, 0.0);
+        glPushMatrix();
+            glRotatef(50, 0.0, 1.0, 0.0);
+            glRotatef(180, 1.0, 0.0, 0.0);
+            gluCylinder(quadric, 0.1, 0.1, 0.5, 20, 20);
+            glTranslatef(0.0, 0.0, 0.5);
+            gluDisk(quadric, 0.0, 0.1, 100, 100);
+        glPopMatrix();
+        glPushMatrix();
+            glRotatef(-40, 0.0, 1.0, 0.0);
+            glRotatef(180, 1.0, 0.0, 0.0);
+            gluCylinder(quadric, 0.1, 0.1, 0.5, 20, 20);
+            glTranslatef(0.0, 0.0, 0.5);
+            gluDisk(quadric, 0.0, 0.1, 100, 100);
+        glPopMatrix();
+        
+        glTranslatef(0.0, 0.2, 0.0);
+        glutSolidSphere(0.3, 100, 100);
     glPopMatrix();
 }
 
@@ -543,16 +566,26 @@ void draw(void) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    if (changeCamera == 1) {
+    if (changeCamera == 0) {
         gluLookAt(robotWalkingSide,110 + cameraAngle,robotWalkingUp+50, robotWalkingSide,0,robotWalkingUp, 0,1,0);
-  	} else if (changeCamera == 2) {
+  	} else if (changeCamera == 1) {
         gluLookAt(cameraX,20 + cameraAngle,cameraZ, robotWalkingSide,0,robotWalkingUp, 0,1,0);
-    } else if (changeCamera == 3) {
+    } else if (changeCamera == 2) {
         gluLookAt(-2*Scale,10 + cameraAngle,-Scale + 1, -4*Scale,4,-Scale, 0,1,0);
-    } else if (changeCamera == 4) {
+    } else if (changeCamera == 3) {
         gluLookAt(-3*Scale,6 + cameraAngle,-3*Scale, -3*Scale,4,-5*Scale, 0,1,0);
-    } else if (changeCamera == 5) {
+    } else if (changeCamera == 4) {
         gluLookAt(3*Scale,3 + cameraAngle,-3*Scale, 4*Scale,3,-3*Scale, 0,1,0);
+    } else if (changeCamera == 5) {
+        gluLookAt(8*Scale,10 + cameraAngle,-3*Scale, 10*Scale,3,-3*Scale, 0,1,0);
+    } else if (changeCamera == 6) {
+        gluLookAt(robotWalkingSide, 20 + cameraAngle,robotWalkingUp-10, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+    } else if (changeCamera == 7) {
+        gluLookAt(robotWalkingSide+10, 20 + cameraAngle,robotWalkingUp, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+    } else if (changeCamera == 8) {
+        gluLookAt(robotWalkingSide-10, 20 + cameraAngle,robotWalkingUp, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+    } else if (changeCamera == 9) {
+        gluLookAt(robotWalkingSide, 20 + cameraAngle,robotWalkingUp+10, robotWalkingSide,0,robotWalkingUp, 0,1,0);
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -676,15 +709,23 @@ void keyPressed(unsigned char key, int x, int y) {
 	if (key == 'c') {
         cameraAngle = 0;
 		changeCamera++;
-        if (changeCamera == 6) {
-            changeCamera = 1;
+        if (changeCamera == 10) {
+            changeCamera = 0;
         }
-    } else if (key == '+') {
+    } 
+    
+    if (key == '+') {
         cameraAngle -= 1;
-    } else if (key == '-') {
+    } 
+    
+    if (key == '-') {
         cameraAngle += 1;
     }
-    //	glutPostRedisplay();
+
+    if (key == '0' or key == '1' or key == '2' or key == '3' or key == '4' or key == '5' or key == '6' or key == '7' or key == '8' or key == '9') {
+        cameraAngle = 0;
+        changeCamera = (int)key - 48;
+    }
 }
 
 // Start rendering params
