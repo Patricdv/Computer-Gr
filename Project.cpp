@@ -8,8 +8,23 @@
 
 #include <GL/glut.h>
 #include <GL/glu.h>
+#include <stdio.h>
 #include <math.h>
+#include "BCommandLine.h"
 
+
+///////////////////////////////////////////////////
+///////////////   Texture Consts  /////////////////
+///////////////////////////////////////////////////
+#define MAXTEXTURES 1
+int objeto, map;
+GLuint id;
+unsigned char * loadBMP_custom(const char *, unsigned int&, unsigned int&);
+GLuint texnum[MAXTEXTURES]; // [0]-> Walls, [1] -> Water
+
+///////////////////////////////////////////////////
+///////////////   Maze Consts  /////////////////
+///////////////////////////////////////////////////
 #define MazeHeight 10
 #define MazeWidth 10
 #define Scale 6
@@ -71,6 +86,78 @@ void nurbs(GLfloat cp[4][4][3], GLint un, GLint vn) {
     glEnd();
 }
 
+void drawWall(float size) {
+    size = size / 2;
+
+
+    glColor3f(1, 1, 1);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texnum[0]);
+    glEnable(GL_AUTO_NORMAL);
+    glBegin(GL_QUADS);
+        // TRASEIRA
+        glTexCoord2f(1, 0);
+        glVertex3f(size, -size, size);
+        glTexCoord2f(1, 1);
+        glVertex3f(size,  size, size);
+        glTexCoord2f(0, 1);
+        glVertex3f(-size,  size, size);
+        glTexCoord2f(0, 0);
+        glVertex3f(-size, -size, size);
+
+        // FRENTE
+        glTexCoord2f(1, 0);
+        glVertex3f(size, -size, -size);
+        glTexCoord2f(1, 1);
+        glVertex3f(size, size, -size);
+        glTexCoord2f(0, 1);
+        glVertex3f(-size, size, -size);
+        glTexCoord2f(0, 0);
+        glVertex3f(-size, -size, -size);
+
+        // DIREITA
+        glTexCoord2f(1, 0);
+        glVertex3f(size, -size, -size);
+        glTexCoord2f(1, 1);
+        glVertex3f(size, size, -size);
+        glTexCoord2f(0, 1);
+        glVertex3f(size, size, size);
+        glTexCoord2f(0, 0);
+        glVertex3f(size, -size, size);
+
+        // ESQUERDA
+        glTexCoord2f(1, 0);
+        glVertex3f(-size, -size, size);
+        glTexCoord2f(1, 1);
+        glVertex3f(-size, size, size);
+        glTexCoord2f(0, 1);
+        glVertex3f(-size, size, -size);
+        glTexCoord2f(0, 0);
+        glVertex3f(-size, -size, -size);
+
+        // TOPO
+        glTexCoord2f(1, 0);
+        glVertex3f(size, size, size);
+        glTexCoord2f(1, 1);
+        glVertex3f(size, size, -size);
+        glTexCoord2f(0, 1);
+        glVertex3f(-size, size, -size);
+        glTexCoord2f(0, 0);
+        glVertex3f(-size, size, size);
+
+        // BASE
+        glTexCoord2f(1, 0);
+        glVertex3f(size, -size, -size);
+        glTexCoord2f(1, 1);
+        glVertex3f(size, -size, size);
+        glTexCoord2f(0, 1);
+        glVertex3f(-size, -size, size);
+        glTexCoord2f(0, 0);
+        glVertex3f(-size, -size, -size);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+}
+
 void drawCube(float size) {
     glColor3f(0.48, 0.80, 0.12);
     glutSolidCube(size);
@@ -86,8 +173,12 @@ void drawFloor() {
     gluQuadricNormals(quadric, GLU_SMOOTH);
 
     glPushMatrix();
+      glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, texnum[1]);
+        gluQuadricTexture(quadric, GL_TRUE);
         glRotatef(-90, 1.0, 0.0, 0.0);
         gluDisk(quadric, 0, size, 100, 100);
+      glDisable(GL_TEXTURE_2D);
     glPopMatrix();
 }
 
@@ -543,10 +634,14 @@ void drawFountain() {
         glRotatef(90, 1, 0, 0);
         glTranslatef(0.0, -2.0, 0.0);
 
-        glColor3f(0.0, 0.0, 0.8);
         glTranslatef(0.0, 2, 0.0);
         glRotatef(-90, 1, 0, 0);
-        gluDisk(quadric, 0.0, 2.0, 100, 100);
+        glEnable(GL_TEXTURE_2D);
+            glColor3f(1, 1, 1);
+            glBindTexture(GL_TEXTURE_2D, texnum[1]);
+            gluQuadricTexture(quadric, GL_TRUE);
+            gluDisk(quadric, 0.0, 2.0, 100, 100);
+        glDisable(GL_TEXTURE_2D);
 
         glColor3f(0.7, 0.7, 0.7);
         glutSolidCone(0.4, 2, 20, 20);
@@ -599,6 +694,38 @@ void applyLights() {
   /////////////////////////////////////////////////
 }
 
+GLuint loadTex(unsigned char *Imagem, unsigned int ih,unsigned int iw) {
+    GLuint textureId;
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	  glGenTextures(1, &textureId);
+	  glBindTexture (GL_TEXTURE_2D,textureId);
+	  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, iw, ih, 0,GL_RGB, GL_UNSIGNED_BYTE, Imagem);
+	  gluBuild2DMipmaps(textureId, GL_RGB, iw, ih, GL_RGB, GL_UNSIGNED_BYTE, Imagem);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    return textureId;
+}
+
+void drawTexture(void) {
+	  unsigned int ih = 0, iw = 0;
+	  unsigned char * imagem = NULL;
+	  glShadeModel(GL_SMOOTH);
+
+    imagem = loadBMP_custom("parede.bmp", iw, ih);
+    texnum[0] = loadTex(imagem, ih, iw);
+
+    imagem = loadBMP_custom("agua.bmp", iw, ih);
+    texnum[1]  = loadTex(imagem, ih, iw);
+
+    delete imagem;
+}
+
 void draw(void) {
     int i, j, positionX, positionY;
 
@@ -648,7 +775,7 @@ void draw(void) {
                     positionX = -i;
                     positionY = j - (MazeHeight / 2);
                     glTranslatef(positionY*Scale, 0, positionX*Scale);
-                    drawCube(Scale);
+                    drawWall(Scale);
                 glPopMatrix();
             } else {
                 glPushMatrix();
@@ -825,6 +952,7 @@ int main(int argc, char **argv) {
     glutInitWindowPosition(10, 10);
     glutCreateWindow("Study Test");
     glutTimerFunc(40, redraw, 1);
+    drawTexture();
     glutDisplayFunc(draw);
     glutReshapeFunc(changeWindowSize);
     glutKeyboardFunc(keyPressed);
