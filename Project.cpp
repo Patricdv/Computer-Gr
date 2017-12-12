@@ -124,11 +124,20 @@ void drawPost() {
     glPopMatrix();
 }
 
-void drawBearAndPost() {
-    //Draw of the post aside of the bear
-    drawPost();
+void drawBear() {
+    glPushMatrix();
+        glutSolidSphere(1, 100, 100);
+    glPopMatrix();
+}
 
-    // drawBear nurbs(postCtrlPoints, 30, 30);
+void drawOutsideThings() {
+    //Draw of the post aside of the bear
+    glPushMatrix();
+        drawPost();
+    glPopMatrix();
+
+    drawBear();
+    // nurbs(postCtrlPoints, 30, 30);
 }
 
 void drawWindowedWall(float size) {
@@ -137,7 +146,7 @@ void drawWindowedWall(float size) {
 
     glPushMatrix();
         glTranslatef(8*Scale, 0, 0);
-        drawBearAndPost();
+        drawOutsideThings();
     glPopMatrix();
 
     glPushMatrix();
@@ -154,8 +163,8 @@ void drawWindowedWall(float size) {
             }
         }
 
-        for(i = 1; i<=2; i++) {
-            for(j = 1; j<=2; j++) {
+        for(i = 2; i>=1; i--) {
+            for(j = 2; j>=1; j--) {
                 glPushMatrix();
                     glColor4f(0.5f, 0.8f, 0.1f, 0.15f);
                     glTranslatef(0, brickSize*i, brickSize*j);
@@ -173,41 +182,88 @@ void drawRobotLegs() {
     gluQuadricOrientation(quadric, GLU_OUTSIDE);
     gluQuadricNormals(quadric, GLU_SMOOTH);
 
+    // Left Legs
     glPushMatrix();
         glTranslatef(-0.5, 0, 0);
-        glRotatef(90, 1.0, 0.0, 0.0);
-        glRotatef(-legRotation, 1.0, 0.0, 0.0);
-        glColor3f(0.2, 0.2, 0.2);
-        gluCylinder(quadric, 0.2, 0.2, 1.5, 100, 100);
-        glTranslatef(0, 0, 1.5);
-        glColor3f(0.8, 0.4, 0.4);
-        glutSolidTorus(0.2, 0.1, 100, 100);
-        glColor3f(0.0, 0.4, 0.4);
-        gluCylinder(quadric, 0.2, 0.2, 1.5, 100, 100);
+        glRotatef(legRotation, 0.0, 1.0, 0.0);
 
-        glTranslatef(0, 0, 1.5);
-        glColor3f(0.8, 0.4, 0.4);
-        glutSolidTorus(0.2, 0.1, 100, 100);
+        glPushMatrix();
+            glRotatef(35, 0.0, 1.0, 0.0);
+            glRotatef(90, 1.0, 0.0, 0.0);
+            glRotatef(-60, 0.0, 1.0, 0.0);
+            glColor3f(0.2, 0.2, 0.2);
+            gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
+            glTranslatef(0, 0, 2);
+            glColor3f(0.8, 0.4, 0.4);
+            glutSolidTorus(0.2, 0.1, 100, 100);
+
+            glRotatef(60, 0.0, 1.0, 0.0);
+            glColor3f(0.0, 0.4, 0.4);
+            gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
+            glTranslatef(0, 0, 2);
+            glColor3f(0.8, 0.4, 0.4);
+            glutSolidTorus(0.2, 0.1, 100, 100);
+        glPopMatrix();
+
+        glPushMatrix();
+            glRotatef(-35, 0.0, 1.0, 0.0);
+            glRotatef(90, 1.0, 0.0, 0.0);
+            glRotatef(-60, 0.0, 1.0, 0.0);
+            glColor3f(0.2, 0.2, 0.2);
+            gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
+            glTranslatef(0, 0, 2);
+            glColor3f(0.8, 0.4, 0.4);
+            glutSolidTorus(0.2, 0.1, 100, 100);
+
+            glRotatef(60, 0.0, 1.0, 0.0);
+            glColor3f(0.0, 0.4, 0.4);
+            gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
+            glTranslatef(0, 0, 2);
+            glColor3f(0.8, 0.4, 0.4);
+            glutSolidTorus(0.2, 0.1, 100, 100);
+        glPopMatrix();
     glPopMatrix();
 
-    // Acrescentar as pernas
-
+    // Right Legs
     glPushMatrix();
         glTranslatef(0.5, 0, 0);
-        glRotatef(90, 1.0, 0.0, 0.0);
-        glRotatef(legRotation, 1.0, 0.0, 0.0);
-        glColor3f(0.2, 0.2, 0.2);
-        gluCylinder(quadric, 0.2, 0.2, 1.5, 100, 100);
+        glRotatef(legRotation, 0.0, 1.0, 0.0);
 
-        glTranslatef(0, 0, 1.5);
-        glColor3f(0.8, 0.4, 0.4);
-        glutSolidTorus(0.2, 0.1, 100, 100);
-        glColor3f(0.0, 0.4, 0.4);
-        gluCylinder(quadric, 0.2, 0.2, 1.5, 100, 100);
+        glPushMatrix();
+            glRotatef(40, 0.0, 1.0, 0.0);
+            glRotatef(90, 1.0, 0.0, 0.0);
+            glRotatef(60, 0.0, 1.0, 0.0);
+            glColor3f(0.2, 0.2, 0.2);
+            gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
+            glTranslatef(0, 0, 2);
+            glColor3f(0.8, 0.4, 0.4);
+            glutSolidTorus(0.2, 0.1, 100, 100);
 
-        glTranslatef(0, 0, 1.5);
-        glColor3f(0.8, 0.4, 0.4);
-        glutSolidTorus(0.2, 0.1, 100, 100);
+            glRotatef(-60, 0.0, 1.0, 0.0);
+            glColor3f(0.0, 0.4, 0.4);
+            gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
+            glTranslatef(0, 0, 2);
+            glColor3f(0.8, 0.4, 0.4);
+            glutSolidTorus(0.2, 0.1, 100, 100);
+        glPopMatrix();
+
+        glPushMatrix();
+            glRotatef(-40, 0.0, 1.0, 0.0);
+            glRotatef(90, 1.0, 0.0, 0.0);
+            glRotatef(60, 0.0, 1.0, 0.0);
+            glColor3f(0.2, 0.2, 0.2);
+            gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
+            glTranslatef(0, 0, 2);
+            glColor3f(0.8, 0.4, 0.4);
+            glutSolidTorus(0.2, 0.1, 100, 100);
+
+            glRotatef(-60, 0.0, 1.0, 0.0);
+            glColor3f(0.0, 0.4, 0.4);
+            gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
+            glTranslatef(0, 0, 2);
+            glColor3f(0.8, 0.4, 0.4);
+            glutSolidTorus(0.2, 0.1, 100, 100);
+        glPopMatrix();
     glPopMatrix();
 }
 
