@@ -147,7 +147,7 @@ void drawBear() {
             glTranslatef(0.0, 0.0, 0.5);
             gluDisk(quadric, 0.0, 0.1, 100, 100);
         glPopMatrix();
-        
+
         glTranslatef(0.0, 0.2, 0.0);
         glutSolidSphere(0.3, 100, 100);
     glPopMatrix();
@@ -211,7 +211,7 @@ void drawRobotLegs() {
         glRotatef(legRotation, 0.0, 1.0, 0.0);
 
         glPushMatrix();
-            glRotatef(35, 0.0, 1.0, 0.0);
+            glRotatef(50, 0.0, 1.0, 0.0);
             glRotatef(90, 1.0, 0.0, 0.0);
             glRotatef(-60, 0.0, 1.0, 0.0);
             glColor3f(0.2, 0.2, 0.2);
@@ -229,7 +229,7 @@ void drawRobotLegs() {
         glPopMatrix();
 
         glPushMatrix();
-            glRotatef(-35, 0.0, 1.0, 0.0);
+            glRotatef(-50, 0.0, 1.0, 0.0);
             glRotatef(90, 1.0, 0.0, 0.0);
             glRotatef(-60, 0.0, 1.0, 0.0);
             glColor3f(0.2, 0.2, 0.2);
@@ -253,7 +253,7 @@ void drawRobotLegs() {
         glRotatef(legRotation, 0.0, 1.0, 0.0);
 
         glPushMatrix();
-            glRotatef(40, 0.0, 1.0, 0.0);
+            glRotatef(50, 0.0, 1.0, 0.0);
             glRotatef(90, 1.0, 0.0, 0.0);
             glRotatef(60, 0.0, 1.0, 0.0);
             glColor3f(0.2, 0.2, 0.2);
@@ -271,7 +271,7 @@ void drawRobotLegs() {
         glPopMatrix();
 
         glPushMatrix();
-            glRotatef(-40, 0.0, 1.0, 0.0);
+            glRotatef(-50, 0.0, 1.0, 0.0);
             glRotatef(90, 1.0, 0.0, 0.0);
             glRotatef(60, 0.0, 1.0, 0.0);
             glColor3f(0.2, 0.2, 0.2);
@@ -300,6 +300,7 @@ void drawRobotArms() {
     glPushMatrix();
         glRotatef(90, 1.0, 0.0, 0.0);
 
+        // Left Arm
         glPushMatrix();
           glTranslatef(-1, 0, 0);
           glRotatef(-20, 0.0, 1.0, 0.0);
@@ -311,12 +312,17 @@ void drawRobotArms() {
           gluCylinder(quadric, 0.1, 0.1, 1, 100, 100);
 
           glTranslatef(0, 0, 1);
+          glRotatef(50, 1.0, 0.0, 0.0);
           glColor3f(0.2, 0.2, 0.2);
           glutSolidSphere(0.3, 100, 100);
           glColor3f(0.6, 0.8, 0.6);
           gluCylinder(quadric, 0.2, 0.2, 1, 100, 100);
+          glTranslatef(0, 0, 1);
+          glColor3f(0.2, 0.2, 0.2);
+          glutSolidSphere(0.3, 100, 100);
         glPopMatrix();
 
+        // Right Arm
         glPushMatrix();
           glTranslatef(1, 0, 0);
           glRotatef(20, 0.0, 1.0, 0.0);
@@ -328,10 +334,14 @@ void drawRobotArms() {
           gluCylinder(quadric, 0.1, 0.1, 1, 100, 100);
 
           glTranslatef(0, 0, 1);
+          glRotatef(50, 1.0, 0.0, 0.0);
           glColor3f(0.2, 0.2, 0.2);
           glutSolidSphere(0.3, 100, 100);
           glColor3f(0.6, 0.8, 0.6);
           gluCylinder(quadric, 0.2, 0.2, 1, 100, 100);
+          glTranslatef(0, 0, 1);
+          glColor3f(0.2, 0.2, 0.2);
+          glutSolidSphere(0.3, 100, 100);
         glPopMatrix();
     glPopMatrix();
 }
@@ -560,14 +570,51 @@ void drawFountain() {
     glPopMatrix();
 }
 
+void applyLights() {
+  ////////////////////////////////////////////////
+  //////////////////  First Light ////////////////
+  ////////////////////////////////////////////////
+  GLfloat light1Diffuse[] = {0.3, 0.3, 0.3, 1.0};
+  GLfloat light1Specular[] = {0.3, 0.3, 0.3, 1.0};
+  GLfloat light1Position[] = {0, 50, -5*Scale, 1.0};
+
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, light1Diffuse);
+  glLightfv(GL_LIGHT1, GL_SPECULAR, light1Specular);
+  glLightfv(GL_LIGHT1, GL_POSITION, light1Position);
+  /////////////////////////////////////////////////
+
+  ////////////////////////////////////////////////
+  /////////////////  Second Light ////////////////
+  ////////////////////////////////////////////////
+  GLfloat light2Diffuse[] = {0.5, 0.3, 0.3, 1.0};
+  GLfloat light2Specular[] = {0.5, 0.3, 0.3, 1.0};
+  GLfloat light2Position[] = {12*Scale, 10, -3*Scale, 1.0};
+  GLfloat light2SpotDirection[] = {0, -1, 0};
+
+  glLightfv(GL_LIGHT2, GL_DIFFUSE, light2Diffuse);
+  glLightfv(GL_LIGHT2, GL_SPECULAR, light2Specular);
+  glLightfv(GL_LIGHT2, GL_POSITION, light2Position);
+  glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, 30.0);
+  glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION, light2SpotDirection);
+  /////////////////////////////////////////////////
+}
+
 void draw(void) {
     int i, j, positionX, positionY;
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+    ///////////////////////////////////////////////////
+    /////  All the 10 program cameras            //////
+    /////  0 - The maze's top camera             //////
+    /////  1 - The Camera that follow the Robot  //////
+    /////  2 to 5 - Camera to Objects            //////
+    /////  6 to 9 - Robor side Cameras           //////
+    /////  'c' - to change between them          //////
+    ///////////////////////////////////////////////////
     if (changeCamera == 0) {
-        gluLookAt(robotWalkingSide,110 + cameraAngle,robotWalkingUp+50, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+        gluLookAt(3,100 + cameraAngle,-4*Scale, 3,0,-5*Scale, 0,1,0);
   	} else if (changeCamera == 1) {
         gluLookAt(cameraX,20 + cameraAngle,cameraZ, robotWalkingSide,0,robotWalkingUp, 0,1,0);
     } else if (changeCamera == 2) {
@@ -587,6 +634,8 @@ void draw(void) {
     } else if (changeCamera == 9) {
         gluLookAt(robotWalkingSide, 20 + cameraAngle,robotWalkingUp+10, robotWalkingSide,0,robotWalkingUp, 0,1,0);
     }
+
+    applyLights();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -712,12 +761,12 @@ void keyPressed(unsigned char key, int x, int y) {
         if (changeCamera == 10) {
             changeCamera = 0;
         }
-    } 
-    
+    }
+
     if (key == '+') {
         cameraAngle -= 1;
-    } 
-    
+    }
+
     if (key == '-') {
         cameraAngle += 1;
     }
@@ -733,29 +782,20 @@ void start(void) {
     ////////////////////////////////////////////////
     /////////////////  Enable light ////////////////
     ////////////////////////////////////////////////
-    GLfloat ambientLight[] = {0.2, 0.2, 0.2, 1.0};
-    GLfloat diffuseLight[] = {0.8, 0.8, 0.8, 1.0};
-    GLfloat specularLight[] = { 0.7, 0.7, 0.7, 1.0};
-    GLfloat lightPosition[] = { 12, 10, 12, 1.0 };
+    GLfloat ambientLight[] = {1.0f, 1.0f, 1.0f, 1.0f};
     GLfloat especularity[] = {1.0f, 1.0f, 1.0f, 1.0f};
     GLint materialEspecularity = 10;
 
     glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT1);
+    glEnable(GL_LIGHT2);
+  	glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, especularity);
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, materialEspecularity);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
-    glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight);
-    glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight);
-    glLightfv(GL_LIGHT1, GL_POSITION, lightPosition);
-
-    glEnable(GL_LIGHT1);
-    /////////////////////////////////////////////////
-
 
     // Define a cor de fundo da janela de visualização como preta
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
