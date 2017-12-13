@@ -25,7 +25,7 @@ GLuint texnum[MAXTEXTURES]; // [0]-> Walls, [1] -> Water
 ///////////////////////////////////////////////////
 ///////////////   Maze Consts  /////////////////
 ///////////////////////////////////////////////////
-#define MazeHeight 10
+#define MazeHeight 14
 #define MazeWidth 10
 #define Scale 6
 #define StartPosition 12
@@ -33,11 +33,12 @@ GLuint texnum[MAXTEXTURES]; // [0]-> Walls, [1] -> Water
 const double pi = 3.1415926;
 GLdouble p[3] = {0, 0, 0};
 
-float robotWalkingUp = 0, robotWalkingSide = StartPosition;
+float robotWalkingUp = -StartPosition, robotWalkingSide = StartPosition;
 float cameraX = StartPosition, cameraZ = 12;
 int changeCamera = 0, cameraAngle = 10, legRotation = 0, changeWalking = 0, changeHeadMovement = 0, robotHeadAngle = 0, robotAngle = 0;
-
+/*
 int maze[MazeHeight][MazeWidth] = {
+
         {1, 1, 1, 1, 1, 1, 1, 0, 1, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
         {1, 1, 0, 1, 1, 0, 1, 1, 1, 1},
@@ -48,6 +49,24 @@ int maze[MazeHeight][MazeWidth] = {
         {1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
         {1, 1, 1, 1, 1, 0, 0, 0, 0, 1},
         {1, 1, 1, 1, 1, 0, 1, 1, 1, 1}
+
+};
+*/
+int maze[MazeHeight][MazeWidth] = {
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 1, 1, 1, 1, 1, 0, 1, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+        {1, 1, 0, 1, 1, 0, 1, 1, 1, 1},
+        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 1, 0, 1, 1, 1, 0, 1, 1, 1},
+        {1, 1, 0, 1, 1, 1, 0, 1, 1, 1},
+        {1, 1, 1, 1, 0, 0, 0, 0, 1, 1},
+        {1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1, 0, 0, 0, 0, 1},
+        {1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
 
 GLfloat robotBody[8][3] = { {-1, 0, -1}, {1, 0, -1}, {1, 2, -1}, {-1, 2, -1},
@@ -163,23 +182,27 @@ void drawCube(float size) {
     glutSolidCube(size);
 }
 
-void drawFloor() {
-    float size = 500 / 2;
+void drawFloor(float size) {
 
-    GLUquadricObj * quadric = gluNewQuadric();
+    size = size / 2;
+    glColor3f(1, 1, 1);
 
-    gluQuadricDrawStyle(quadric, GLU_FILL);
-    gluQuadricOrientation(quadric, GLU_OUTSIDE);
-    gluQuadricNormals(quadric, GLU_SMOOTH);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texnum[3]);
+    glEnable(GL_AUTO_NORMAL);
+    glBegin(GL_QUADS);
+        glTexCoord2f(1, 0);
+        glVertex3f(size, -size, -size);
+        glTexCoord2f(1, 1);
+        glVertex3f(size, -size, size);
+        glTexCoord2f(0, 1);
+        glVertex3f(-size, -size, size);
+        glTexCoord2f(0, 0);
+        glVertex3f(-size, -size, -size);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
 
-    glPushMatrix();
-      glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, texnum[1]);
-        gluQuadricTexture(quadric, GL_TRUE);
-        glRotatef(-90, 1.0, 0.0, 0.0);
-        gluDisk(quadric, 0, size, 100, 100);
-      glDisable(GL_TEXTURE_2D);
-    glPopMatrix();
+
 }
 
 void drawPost() {
@@ -606,11 +629,13 @@ void drawTable() {
     glTranslatef(0.0, 4.0, 0.0);
     glRotatef(90, 1, 0, 0);
 
-    glColor3f(0.30, 0.27, 0.0);
-    gluDisk(quadric, 0.0, 1.0, 100, 100);
-
-    glColor3f(0.35, 0.30, 0.0);
-    gluDisk(quadric, 1, 2.5, 100, 100);
+    glColor3f(1, 1, 1);
+    
+     glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, texnum[2]);
+        gluQuadricTexture(quadric, GL_TRUE);
+        gluDisk(quadric, 0.0, 2.5, 100, 100);
+      glDisable(GL_TEXTURE_2D);
 
     glRotatef(-90, 1, 0, 0);
     glTranslatef(0.0, 0.8, 0.0);
@@ -704,10 +729,10 @@ GLuint loadTex(unsigned char *Imagem, unsigned int ih,unsigned int iw) {
 	  gluBuild2DMipmaps(textureId, GL_RGB, iw, ih, GL_RGB, GL_UNSIGNED_BYTE, Imagem);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     return textureId;
 }
@@ -722,6 +747,14 @@ void drawTexture(void) {
 
     imagem = loadBMP_custom("agua.bmp", iw, ih);
     texnum[1]  = loadTex(imagem, ih, iw);
+
+    imagem = loadBMP_custom("mesa.bmp", iw, ih);
+    texnum[2]  = loadTex(imagem, ih, iw);
+
+    imagem = loadBMP_custom("floor.bmp", iw, ih);  
+    texnum[3]  = loadTex(imagem, ih, iw);
+
+
 
     delete imagem;
 }
@@ -766,10 +799,10 @@ void draw(void) {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    drawFloor();
+    glTranslatef(0.0, 0.0, 2*Scale);
     glTranslatef(0.0, Scale/2, 0.0);
-    for (i = 0; i < MazeWidth; i++) {
-        for (j = 0; j < MazeHeight; j++) {
+    for (i = 0; i < MazeHeight; i++) {
+        for (j = 0; j < MazeWidth; j++) {
             if (maze[i][j] == 1) {  // Means there is a cube there
                 glPushMatrix();
                     positionX = -i;
@@ -780,19 +813,20 @@ void draw(void) {
             } else {
                 glPushMatrix();
                     positionX = -i;
-                    positionY = j - (MazeHeight / 2);
+                    positionY = j - (MazeHeight / 2);                 
+        
+                    glTranslatef(positionY*Scale, 0, positionX*Scale);
+                    drawFloor(Scale);      
+                    glTranslatef(0, -Scale/2, 0);
                     if (i == 1 && j == 1) {
-                        glTranslatef(positionY*Scale, -Scale/2, positionX*Scale);
                         drawTable();
                     }
                     if (i == 5 && j == 2) {
-                        glTranslatef(positionY*Scale, -Scale/2, positionX*Scale);
                         glColor3f(0.0,0.0,0.0);
                         drawFountain();
                     }
 
                     if (i == 3 && j == 9) {
-                        glTranslatef(positionY*Scale, -Scale/2, positionX*Scale);
                         glColor3f(0.0,0.0,0.0);
                         drawWindowedWall(Scale);
                     }
