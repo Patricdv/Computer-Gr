@@ -268,7 +268,7 @@ void drawCube(float size) {
 void drawFloor(float size) {
 
     size = size / 2;
-    glColor3f(0.5, 0.5, 0.5);
+    glColor3f(0.4, 0.4, 0.4);
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texnum[3]);
@@ -329,26 +329,34 @@ void drawBear() {
     gluQuadricDrawStyle(quadric, GLU_FILL);
     gluQuadricOrientation(quadric, GLU_OUTSIDE);
     gluQuadricNormals(quadric, GLU_SMOOTH);
-
+    
+    glTranslatef(-3.0, 0.4, 1.0);
     glPushMatrix();
-        glTranslatef(0.0, 0.1, 0.0);
+        glPushMatrix();
+            glTranslatef(0, 1.5, 0.4);
+            glutSolidSphere(0.6, 100, 100);     
+        glPopMatrix();
         glPushMatrix();
             glRotatef(50, 0.0, 1.0, 0.0);
             glRotatef(180, 1.0, 0.0, 0.0);
-            gluCylinder(quadric, 0.1, 0.1, 0.5, 20, 20);
-            glTranslatef(0.0, 0.0, 0.5);
-            gluDisk(quadric, 0.0, 0.1, 100, 100);
+            gluCylinder(quadric, 0.5, 0.3, 1.5, 20, 20);
+            glTranslatef(0.0, 0.0, 0.0);
+            glTranslatef(0.0, 0.0, 1.5);
+            gluDisk(quadric, 0.0, 0.3, 100, 100);
         glPopMatrix();
         glPushMatrix();
             glRotatef(-40, 0.0, 1.0, 0.0);
             glRotatef(180, 1.0, 0.0, 0.0);
-            gluCylinder(quadric, 0.1, 0.1, 0.5, 20, 20);
-            glTranslatef(0.0, 0.0, 0.5);
-            gluDisk(quadric, 0.0, 0.1, 100, 100);
+            gluCylinder(quadric, 0.5, 0.3, 1.5, 20, 20);
+            glTranslatef(0.0, 0.0, 1.5);
+            gluDisk(quadric, 0.0, 0.3, 100, 100);
         glPopMatrix();
 
+   
+
+
         glTranslatef(0.0, 0.2, 0.0);
-        glutSolidSphere(0.3, 100, 100);
+        glutSolidSphere(1, 100, 100);
     glPopMatrix();
 }
 
@@ -879,7 +887,7 @@ void drawTexture(void) {
     imagem = loadBMP_custom("mesa.bmp", iw, ih);
     texnum[2]  = loadTex(imagem, ih, iw);
 
-    imagem = loadBMP_custom("floor.bmp", iw, ih);
+    imagem = loadBMP_custom("floorn.bmp", iw, ih);
     texnum[3]  = loadTex(imagem, ih, iw);
 
     delete imagem;
