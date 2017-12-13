@@ -139,6 +139,53 @@ void nurbs(GLfloat cp[4][4][3], GLint un, GLint vn) {
         }
     glEnd();
 }
+void drawBox(GLfloat size, GLenum type){
+  static GLfloat n[6][3] =
+  {
+    {-1.0, 0.0, 0.0},
+    {0.0, 1.0, 0.0},
+    {1.0, 0.0, 0.0},
+    {0.0, -1.0, 0.0},
+    {0.0, 0.0, 1.0},
+    {0.0, 0.0, -1.0}
+  };
+  static GLint faces[6][4] =
+  {
+    {0, 1, 2, 3},
+    {3, 2, 6, 7},
+    {7, 6, 5, 4},
+    {4, 5, 1, 0},
+    {5, 6, 2, 1},
+    {7, 4, 0, 3}
+  };
+  GLfloat v[8][3];
+  GLint i;
+
+  v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
+  v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
+  v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
+  v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
+  v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
+  v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
+
+  glColor3f(0.4, 0.4, 0.4);
+  glEnable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, texnum[0]);  
+  for (i = 5; i >= 0; i--) {
+    glBegin(type);
+        glNormal3fv(&n[i][0]);
+        glTexCoord2f(1, 0);
+        glVertex3fv(&v[faces[i][0]][0]);
+        glTexCoord2f(1, 1);
+        glVertex3fv(&v[faces[i][1]][0]);
+        glTexCoord2f(0, 1);        
+        glVertex3fv(&v[faces[i][2]][0]);
+        glTexCoord2f(0,0);
+        glVertex3fv(&v[faces[i][3]][0]);
+    glEnd();
+  }
+  glDisable(GL_TEXTURE_2D);  
+}
 
 void drawWall(float size) {
     size = size / 2;
@@ -221,12 +268,14 @@ void drawCube(float size) {
 void drawFloor(float size) {
 
     size = size / 2;
-    glColor3f(1, 1, 1);
+    glColor3f(0.5, 0.5, 0.5);
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texnum[3]);
-    glEnable(GL_AUTO_NORMAL);
+    static GLfloat normal[] = {0.0, 1.0, 0.0};
+        
     glBegin(GL_QUADS);
+        glNormal3fv(&normal[0]);
         glTexCoord2f(1, 0);
         glVertex3f(size, -size, -size);
         glTexCoord2f(1, 1);
@@ -657,11 +706,12 @@ void drawRobot() {
 
 void drawTable() {
     GLUquadricObj * quadric = gluNewQuadric();
-
+    glEnable(GL_AUTO_NORMAL);
     gluQuadricDrawStyle(quadric, GLU_FILL);
     gluQuadricOrientation(quadric, GLU_OUTSIDE);
     gluQuadricNormals(quadric, GLU_SMOOTH);
 
+    
     glRotatef(45, 0, 1, 0);
 
     glPushMatrix();
@@ -695,7 +745,7 @@ void drawTable() {
     glTranslatef(0.0, 4.0, 0.0);
     glRotatef(90, 1, 0, 0);
 
-    glColor3f(1, 1, 1);
+    glColor3f(1,1,1);
 
      glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, texnum[2]);
@@ -883,7 +933,8 @@ void draw(void) {
                     positionX = -i;
                     positionY = j - (MazeWidth / 2);
                     glTranslatef(positionY*Scale, 0, positionX*Scale);
-                    drawWall(Scale);
+                    drawBox(Scale, GL_QUADS);
+                    //drawWall(Scale);
                 glPopMatrix();
             } else {
                 glPushMatrix();
