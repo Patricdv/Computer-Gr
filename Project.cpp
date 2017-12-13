@@ -26,47 +26,32 @@ GLuint texnum[MAXTEXTURES]; // [0]-> Walls, [1] -> Water
 ///////////////   Maze Consts  /////////////////
 ///////////////////////////////////////////////////
 #define MazeHeight 14
-#define MazeWidth 10
+#define MazeWidth 26
 #define Scale 6
 #define StartPosition 12
 
 const double pi = 3.1415926;
 GLdouble p[3] = {0, 0, 0};
 
-float robotWalkingUp = -StartPosition, robotWalkingSide = StartPosition;
+float robotWalkingUp = Scale, robotWalkingSide = StartPosition;
 float cameraX = StartPosition, cameraZ = 12;
 int changeCamera = 0, cameraAngle = 10, legRotation = 0, changeWalking = 0, changeHeadMovement = 0, robotHeadAngle = 0, robotAngle = 0;
-/*
-int maze[MazeHeight][MazeWidth] = {
 
-        {1, 1, 1, 1, 1, 1, 1, 0, 1, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-        {1, 1, 0, 1, 1, 0, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-        {1, 1, 0, 1, 1, 1, 0, 1, 1, 1},
-        {1, 1, 0, 1, 1, 1, 0, 1, 1, 1},
-        {1, 1, 1, 1, 0, 0, 0, 0, 1, 1},
-        {1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 0, 0, 0, 0, 1},
-        {1, 1, 1, 1, 1, 0, 1, 1, 1, 1}
-
-};
-*/
 int maze[MazeHeight][MazeWidth] = {
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {1, 1, 1, 1, 1, 1, 1, 0, 1, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 1, 1},
-        {1, 1, 0, 1, 1, 0, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-        {1, 1, 0, 1, 1, 1, 0, 1, 1, 1},
-        {1, 1, 0, 1, 1, 1, 0, 1, 1, 1},
-        {1, 1, 1, 1, 0, 0, 0, 0, 1, 1},
-        {1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 0, 0, 0, 0, 1},
-        {1, 1, 1, 1, 1, 0, 1, 1, 1, 1},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
 
 GLfloat robotBody[8][3] = { {-1, 0, -1}, {1, 0, -1}, {1, 2, -1}, {-1, 2, -1},
@@ -630,7 +615,7 @@ void drawTable() {
     glRotatef(90, 1, 0, 0);
 
     glColor3f(1, 1, 1);
-    
+
      glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, texnum[2]);
         gluQuadricTexture(quadric, GL_TRUE);
@@ -751,7 +736,7 @@ void drawTexture(void) {
     imagem = loadBMP_custom("mesa.bmp", iw, ih);
     texnum[2]  = loadTex(imagem, ih, iw);
 
-    imagem = loadBMP_custom("floor.bmp", iw, ih);  
+    imagem = loadBMP_custom("floor.bmp", iw, ih);
     texnum[3]  = loadTex(imagem, ih, iw);
 
 
@@ -761,7 +746,7 @@ void drawTexture(void) {
 
 void draw(void) {
     int i, j, positionX, positionY;
-
+    int wallX = 5, wallY = 17;
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -799,42 +784,48 @@ void draw(void) {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glTranslatef(0.0, 0.0, 2*Scale);
-    glTranslatef(0.0, Scale/2, 0.0);
+    glTranslatef(0.0, Scale/2, 2*Scale);
     for (i = 0; i < MazeHeight; i++) {
         for (j = 0; j < MazeWidth; j++) {
             if (maze[i][j] == 1) {  // Means there is a cube there
                 glPushMatrix();
                     positionX = -i;
-                    positionY = j - (MazeHeight / 2);
+                    positionY = j - (MazeWidth / 2);
                     glTranslatef(positionY*Scale, 0, positionX*Scale);
                     drawWall(Scale);
                 glPopMatrix();
             } else {
                 glPushMatrix();
                     positionX = -i;
-                    positionY = j - (MazeHeight / 2);                 
-        
+                    positionY = j - (MazeWidth / 2);
+
                     glTranslatef(positionY*Scale, 0, positionX*Scale);
-                    drawFloor(Scale);      
+                    drawFloor(Scale);
                     glTranslatef(0, -Scale/2, 0);
-                    if (i == 1 && j == 1) {
+                    if (i == 3 && j == 9) {
                         drawTable();
                     }
-                    if (i == 5 && j == 2) {
+                    if (i == 7 && j == 10) {
                         glColor3f(0.0,0.0,0.0);
                         drawFountain();
-                    }
-
-                    if (i == 3 && j == 9) {
-                        glColor3f(0.0,0.0,0.0);
-                        drawWindowedWall(Scale);
                     }
                 glPopMatrix();
             }
         }
     }
-    glTranslatef(0.0, -Scale/2, 0.0);
+
+    //Draw windowed wall after objects otherwise they don't show up beside the glass
+    glPushMatrix();
+        positionX = -wallX;
+        positionY = wallY - (MazeWidth / 2);
+
+        glTranslatef(positionY*Scale, -Scale/2, positionX*Scale);
+
+        glColor3f(0.0,0.0,0.0);
+        drawWindowedWall(Scale);
+    glPopMatrix();
+
+    glTranslatef(0.0, -Scale/2, -2*Scale);
 
     glTranslatef(robotWalkingSide, 0, robotWalkingUp);
     drawRobot();
