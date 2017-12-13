@@ -33,9 +33,9 @@ GLuint texnum[MAXTEXTURES]; // [0]-> Walls, [1] -> Water
 const double pi = 3.1415926;
 GLdouble p[3] = {0, 0, 0};
 
-float robotWalkingUp = Scale, robotWalkingSide = StartPosition;
-float cameraX = StartPosition, cameraZ = 12;
-int changeCamera = 0, cameraAngle = 10, legRotation = 0, changeWalking = 0, changeHeadMovement = 0, robotHeadAngle = 0, robotAngle = 0;
+float robotWalkingUp = Scale, robotWalkingSide = StartPosition, heartY = 4;
+float cameraX = StartPosition, cameraZ = Scale + 12;
+int changeCamera = 0, cameraAngle = 10, legRotation = 0, changeWalking = 0, changeHeadMovement = 0, robotHeadAngle = 0, robotAngle = 0, heartGrow = 0;
 
 int maze[MazeHeight][MazeWidth] = {
         {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -71,12 +71,45 @@ GLfloat postCtrlPoints[4][4][3] = {
         { { 0.0, 0.0, 0.0 },{ 2.0, 2.0, 0.0 },{ -2.5, 3.2, 0.0 },{ -3.8, 1.45, 0.0 } }
 };
 
-void nurbs(GLfloat cp[4][4][3], GLint un, GLint vn) {
-    int u, v;
+GLfloat heartFlCtrlPoints[4][4][3] = {
+        { { 0.0, 0.0, 0.0 },{ -1.823, 0.973, 0.0 },{ -1.222, 2.506, 0.0 },{0, 1.781, 0.0 } },
+        { { 0.0, 0.0, 0.0 },{ -1.2, 0.973, 0.12 },{ -0.6, 2.506, 0.23 },{0, 1.781, 0.0 } },
+        { { 0.0, 0.0, 0.0 },{ -0.6, 0.973, 0.25 },{ -0.3, 2.3, 0.45 },{0, 1.781, 0.0 } },
+        { { 0.0, 0.0, 0.0 },{ 0.0, 0.973, 0.25 },{ 0.0, 2.1, 0.45 },{0, 1.781, 0.0 } },
+};
+GLfloat heartBrCtrlPoints[4][4][3] = {
+        { { 0.0, 0.0, 0.0 },{ -1.823, 0.973, 0.0 },{ -1.222, 2.506, 0.0 },{0, 1.781, 0.0 } },
+        { { 0.0, 0.0, 0.0 },{ -1.2, 0.973, -0.12 },{ -0.6, 2.506, -0.23 },{0, 1.781, 0.0 } },
+        { { 0.0, 0.0, 0.0 },{ -0.6, 0.973, -0.25 },{ -0.3, 2.3, -0.45 },{0, 1.781, 0.0 } },
+        { { 0.0, 0.0, 0.0 },{ 0.0, 0.973, -0.25 },{ 0.0, 2.1, -0.45 },{0, 1.781, 0.0 } },
+};
 
+void nurbsHeart(GLfloat cp[4][4][3], GLint un, GLint vn) {
+    int u, v;
+    glEnable(GL_AUTO_NORMAL);
     glMap2f(GL_MAP2_VERTEX_3, 0, 1, 12, 4, 0, 1, 3, 4, &cp[0][0][0]);
     glEnable(GL_MAP2_VERTEX_3);
+   
+
+    glBegin(GL_QUADS);
+        for (u = 0; u < un; u++) {
+            for (v = 0; v < vn; v++) {
+                glEvalCoord2f((GLfloat)v / vn, (GLfloat)(u+1) / un);
+                glEvalCoord2f((GLfloat)(v+1) / vn, (GLfloat)(u+1) / un);
+                glEvalCoord2f((GLfloat)(v+1) / vn, (GLfloat)u / un);
+                glEvalCoord2f((GLfloat)v / vn, (GLfloat)u / un);
+            }
+        }
+    glEnd();
+}
+
+
+void nurbs(GLfloat cp[4][4][3], GLint un, GLint vn) {
+    int u, v;
     glEnable(GL_AUTO_NORMAL);
+    glMap2f(GL_MAP2_VERTEX_3, 0, 1, 12, 4, 0, 1, 3, 4, &cp[0][0][0]);
+    glEnable(GL_MAP2_VERTEX_3);
+
 
     glBegin(GL_QUADS);
         for (u = 0; u < un; u++) {
@@ -97,7 +130,7 @@ void drawWall(float size) {
     glColor3f(1, 1, 1);
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texnum[0]);
-    glEnable(GL_AUTO_NORMAL);
+
     glBegin(GL_QUADS);
         // TRASEIRA
         glTexCoord2f(1, 0);
@@ -160,6 +193,7 @@ void drawWall(float size) {
         glVertex3f(-size, -size, -size);
     glEnd();
     glDisable(GL_TEXTURE_2D);
+    glEnable(GL_AUTO_NORMAL);
 }
 
 void drawCube(float size) {
@@ -254,12 +288,43 @@ void drawBear() {
 
 void drawOutsideThings() {
     //Draw of the post aside of the bear
+ 
     glPushMatrix();
-        drawPost();
+        glColor3f(3,0,0);
+        
+        glTranslatef(-4, heartY, 0);
+        glRotatef(-45, 0, 1, 0);
+        nurbsHeart(heartFlCtrlPoints, 50,50);
+
+        nurbsHeart(heartBrCtrlPoints,50,50);
+
+        glRotatef(180, 0, 1, 0);
+        nurbsHeart(heartFlCtrlPoints, 50,50);
+
+        nurbsHeart(heartBrCtrlPoints,50,50);
+        if (heartGrow == 0) {
+            if (heartY > 6) {
+                heartGrow = 1;
+                heartY -= 0.1;            
+            } else {
+                heartY += 0.1;
+            }
+        } else{
+             if (heartY <= 4) {
+                heartGrow = 0;
+                heartY += 0.1;            
+            } else {
+                heartY -= 0.1;
+            }
+        }
     glPopMatrix();
 
+    glPushMatrix();
+        glColor3f(0.2,0,0.3);
+        drawPost();
+    glPopMatrix();
     drawBear();
-    // nurbs(postCtrlPoints, 30, 30);
+
 }
 
 void drawWindowedWall(float size) {
@@ -717,7 +782,11 @@ GLuint loadTex(unsigned char *Imagem, unsigned int ih,unsigned int iw) {
 	  glBindTexture (GL_TEXTURE_2D,textureId);
 	  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, iw, ih, 0,GL_RGB, GL_UNSIGNED_BYTE, Imagem);
 	  gluBuild2DMipmaps(textureId, GL_RGB, iw, ih, GL_RGB, GL_UNSIGNED_BYTE, Imagem);
+
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -764,7 +833,7 @@ void draw(void) {
     /////  'c' - to change between them          //////
     ///////////////////////////////////////////////////
     if (changeCamera == 0) {
-        gluLookAt(3,100 + cameraAngle,-4*Scale, 3,0,-5*Scale, 0,1,0);
+        gluLookAt(-2*Scale,150 + cameraAngle,-10*Scale, -2*Scale,0,-5*Scale, 0,1,0);
   	} else if (changeCamera == 1) {
         gluLookAt(cameraX,20 + cameraAngle,cameraZ, robotWalkingSide,0,robotWalkingUp, 0,1,0);
     } else if (changeCamera == 2) {
