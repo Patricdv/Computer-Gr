@@ -102,12 +102,29 @@ void nurbsHeart(GLfloat cp[4][4][3], GLint un, GLint vn) {
         }
     glEnd();
 }
+void nurbsHeart2(GLfloat cp[4][4][3], GLint un, GLint vn) {
+    int u, v;
+    glEnable(GL_AUTO_NORMAL);
+    glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &cp[0][0][0]);
+    glEnable(GL_MAP2_VERTEX_3);
+   
 
+    glBegin(GL_QUADS);
+        for (u = 0; u < un; u++) {
+            for (v = 0; v < vn; v++) {
+                glEvalCoord2f((GLfloat)v / vn, (GLfloat)(u+1) / un);
+                glEvalCoord2f((GLfloat)(v+1) / vn, (GLfloat)(u+1) / un);
+                glEvalCoord2f((GLfloat)(v+1) / vn, (GLfloat)u / un);
+                glEvalCoord2f((GLfloat)v / vn, (GLfloat)u / un);
+            }
+        }
+    glEnd();
+}
 
 void nurbs(GLfloat cp[4][4][3], GLint un, GLint vn) {
     int u, v;
     glEnable(GL_AUTO_NORMAL);
-    glMap2f(GL_MAP2_VERTEX_3, 0, 1, 12, 4, 0, 1, 3, 4, &cp[0][0][0]);
+    glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &cp[0][0][0]);
     glEnable(GL_MAP2_VERTEX_3);
 
 
@@ -127,7 +144,7 @@ void drawWall(float size) {
     size = size / 2;
 
 
-    glColor3f(1, 1, 1);
+    glColor3f(1,1,1);
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texnum[0]);
 
@@ -290,18 +307,18 @@ void drawOutsideThings() {
     //Draw of the post aside of the bear
  
     glPushMatrix();
-        glColor3f(3,0,0);
-        
+        glColor3f(1,0.3,0.6);
+       
         glTranslatef(-4, heartY, 0);
         glRotatef(-45, 0, 1, 0);
         nurbsHeart(heartFlCtrlPoints, 50,50);
 
-        nurbsHeart(heartBrCtrlPoints,50,50);
+        nurbsHeart2(heartBrCtrlPoints,50,50);
 
         glRotatef(180, 0, 1, 0);
         nurbsHeart(heartFlCtrlPoints, 50,50);
 
-        nurbsHeart(heartBrCtrlPoints,50,50);
+        nurbsHeart2(heartBrCtrlPoints,50,50);
         if (heartGrow == 0) {
             if (heartY > 6) {
                 heartGrow = 1;
@@ -349,7 +366,6 @@ void drawWindowedWall(float size) {
                 glPopMatrix();
             }
         }
-
         for(i = 2; i>=1; i--) {
             for(j = 2; j>=1; j--) {
                 glPushMatrix();
@@ -783,17 +799,20 @@ GLuint loadTex(unsigned char *Imagem, unsigned int ih,unsigned int iw) {
 	  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, iw, ih, 0,GL_RGB, GL_UNSIGNED_BYTE, Imagem);
 	  gluBuild2DMipmaps(textureId, GL_RGB, iw, ih, GL_RGB, GL_UNSIGNED_BYTE, Imagem);
 
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2);
+
+
+ 
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    
+    glEnable(GL_TEXTURE_2D);
     return textureId;
+   
 }
 
 void drawTexture(void) {
@@ -812,8 +831,6 @@ void drawTexture(void) {
 
     imagem = loadBMP_custom("floor.bmp", iw, ih);
     texnum[3]  = loadTex(imagem, ih, iw);
-
-
 
     delete imagem;
 }
