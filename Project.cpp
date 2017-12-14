@@ -35,7 +35,7 @@ GLdouble p[3] = {0, 0, 0};
 
 float robotWalkingUp = Scale, robotWalkingSide = StartPosition, heartY = 4;
 float cameraX = StartPosition, cameraZ = Scale + 12;
-int changeCamera = 0, cameraAngle = 10, legRotation = 0, changeWalking = 0, changeHeadMovement = 0, robotHeadAngle = 0, robotAngle = 0, heartGrow = 0;
+int changeCamera = 0, cameraAngle = 10, legRotation = 0, changeWalking = 0, changeHeadMovement = 0, robotHeadAngle = 0, robotAngle = 0, heartGrow = 0, turnFly = 0, fly = 0, bottonSpin = 0;
 
 int maze[MazeHeight][MazeWidth] = {
         {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -89,7 +89,7 @@ void nurbsHeart(GLfloat cp[4][4][3], GLint un, GLint vn) {
     glEnable(GL_AUTO_NORMAL);
     glMap2f(GL_MAP2_VERTEX_3, 0, 1, 12, 4, 0, 1, 3, 4, &cp[0][0][0]);
     glEnable(GL_MAP2_VERTEX_3);
-   
+
 
     glBegin(GL_QUADS);
         for (u = 0; u < un; u++) {
@@ -102,12 +102,13 @@ void nurbsHeart(GLfloat cp[4][4][3], GLint un, GLint vn) {
         }
     glEnd();
 }
+
 void nurbsHeart2(GLfloat cp[4][4][3], GLint un, GLint vn) {
     int u, v;
     glEnable(GL_AUTO_NORMAL);
     glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &cp[0][0][0]);
     glEnable(GL_MAP2_VERTEX_3);
-   
+
 
     glBegin(GL_QUADS);
         for (u = 0; u < un; u++) {
@@ -139,6 +140,7 @@ void nurbs(GLfloat cp[4][4][3], GLint un, GLint vn) {
         }
     glEnd();
 }
+
 void drawBox(GLfloat size, GLenum type){
   static GLfloat n[6][3] =
   {
@@ -170,7 +172,7 @@ void drawBox(GLfloat size, GLenum type){
 
   glColor3f(0.4, 0.4, 0.4);
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, texnum[0]);  
+  glBindTexture(GL_TEXTURE_2D, texnum[0]);
   for (i = 5; i >= 0; i--) {
     glBegin(type);
         glNormal3fv(&n[i][0]);
@@ -178,18 +180,18 @@ void drawBox(GLfloat size, GLenum type){
         glVertex3fv(&v[faces[i][0]][0]);
         glTexCoord2f(1, 1);
         glVertex3fv(&v[faces[i][1]][0]);
-        glTexCoord2f(0, 1);        
+        glTexCoord2f(0, 1);
         glVertex3fv(&v[faces[i][2]][0]);
         glTexCoord2f(0,0);
         glVertex3fv(&v[faces[i][3]][0]);
     glEnd();
   }
-  glDisable(GL_TEXTURE_2D);  
+
+  glDisable(GL_TEXTURE_2D);
 }
 
 void drawWall(float size) {
     size = size / 2;
-
 
     glColor3f(1,1,1);
     glEnable(GL_TEXTURE_2D);
@@ -266,14 +268,13 @@ void drawCube(float size) {
 }
 
 void drawFloor(float size) {
-
     size = size / 2;
     glColor3f(0.4, 0.4, 0.4);
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texnum[3]);
     static GLfloat normal[] = {0.0, 1.0, 0.0};
-        
+
     glBegin(GL_QUADS);
         glNormal3fv(&normal[0]);
         glTexCoord2f(1, 0);
@@ -286,8 +287,6 @@ void drawFloor(float size) {
         glVertex3f(-size, -size, -size);
     glEnd();
     glDisable(GL_TEXTURE_2D);
-
-
 }
 
 void drawPost() {
@@ -329,31 +328,49 @@ void drawBear() {
     gluQuadricDrawStyle(quadric, GLU_FILL);
     gluQuadricOrientation(quadric, GLU_OUTSIDE);
     gluQuadricNormals(quadric, GLU_SMOOTH);
-    
+
     glTranslatef(-3.0, 0.4, 1.0);
     glPushMatrix();
         glPushMatrix();
             glTranslatef(0, 1.5, 0.4);
-            glutSolidSphere(0.6, 100, 100);     
+            glutSolidSphere(0.6, 100, 100);
         glPopMatrix();
+
         glPushMatrix();
             glRotatef(50, 0.0, 1.0, 0.0);
             glRotatef(180, 1.0, 0.0, 0.0);
-            gluCylinder(quadric, 0.5, 0.3, 1.5, 20, 20);
-            glTranslatef(0.0, 0.0, 0.0);
-            glTranslatef(0.0, 0.0, 1.5);
+            gluCylinder(quadric, 0.5, 0.3, 1.7, 20, 20);
+
+            glTranslatef(0.0, 0.0, 1.7);
             gluDisk(quadric, 0.0, 0.3, 100, 100);
         glPopMatrix();
+
         glPushMatrix();
             glRotatef(-40, 0.0, 1.0, 0.0);
             glRotatef(180, 1.0, 0.0, 0.0);
-            gluCylinder(quadric, 0.5, 0.3, 1.5, 20, 20);
-            glTranslatef(0.0, 0.0, 1.5);
+            gluCylinder(quadric, 0.5, 0.3, 1.7, 20, 20);
+
+            glTranslatef(0.0, 0.0, 1.7);
             gluDisk(quadric, 0.0, 0.3, 100, 100);
         glPopMatrix();
 
-   
+        glPushMatrix();
+            glRotatef(50, 0.0, 1.0, 0.0);
+            glRotatef(-130, 1.0, 0.0, 0.0);
+            gluCylinder(quadric, 0.3, 0.2, 1.6, 20, 20);
 
+            glTranslatef(0.0, 0.0, 1.6);
+            gluDisk(quadric, 0.0, 0.2, 100, 100);
+        glPopMatrix();
+
+        glPushMatrix();
+            glRotatef(-40, 0.0, 1.0, 0.0);
+            glRotatef(-130, 1.0, 0.0, 0.0);
+            gluCylinder(quadric, 0.3, 0.2, 1.6, 20, 20);
+
+            glTranslatef(0.0, 0.0, 1.6);
+            gluDisk(quadric, 0.0, 0.2, 100, 100);
+        glPopMatrix();
 
         glTranslatef(0.0, 0.2, 0.0);
         glutSolidSphere(1, 100, 100);
@@ -362,10 +379,10 @@ void drawBear() {
 
 void drawOutsideThings() {
     //Draw of the post aside of the bear
- 
+
     glPushMatrix();
         glColor3f(1,0.3,0.6);
-       
+
         glTranslatef(-4, heartY, 0);
         glRotatef(-45, 0, 1, 0);
         nurbsHeart(heartFlCtrlPoints, 50,50);
@@ -379,14 +396,14 @@ void drawOutsideThings() {
         if (heartGrow == 0) {
             if (heartY > 6) {
                 heartGrow = 1;
-                heartY -= 0.1;            
+                heartY -= 0.1;
             } else {
                 heartY += 0.1;
             }
         } else{
              if (heartY <= 4) {
                 heartGrow = 0;
-                heartY += 0.1;            
+                heartY += 0.1;
             } else {
                 heartY -= 0.1;
             }
@@ -445,19 +462,30 @@ void drawRobotLegs() {
     // Left Legs
     glPushMatrix();
         glTranslatef(-0.5, 0, 0);
-        glRotatef(legRotation, 0.0, 1.0, 0.0);
+
+        if (turnFly == 0) {
+            glRotatef(legRotation, 0.0, 1.0, 0.0);
+        }
 
         glPushMatrix();
-            glRotatef(50, 0.0, 1.0, 0.0);
-            glRotatef(90, 1.0, 0.0, 0.0);
-            glRotatef(-60, 0.0, 1.0, 0.0);
+            if (turnFly == 0) {
+                glRotatef(50, 0.0, 1.0, 0.0);
+                glRotatef(90, 1.0, 0.0, 0.0);
+                glRotatef(-60, 0.0, 1.0, 0.0);
+            } else {
+                glRotatef(60, 0.0, 1.0, 0.0);
+                glRotatef(90, 1.0, 0.0, 0.0);
+                glRotatef(-90, 0.0, 1.0, 0.0);
+            }
             glColor3f(0.2, 0.2, 0.2);
             gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
             glTranslatef(0, 0, 2);
             glColor3f(0.8, 0.4, 0.4);
             glutSolidTorus(0.2, 0.1, 100, 100);
 
-            glRotatef(60, 0.0, 1.0, 0.0);
+            if (turnFly == 0) {
+                glRotatef(60, 0.0, 1.0, 0.0);
+            }
             glColor3f(0.0, 0.4, 0.4);
             gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
             glTranslatef(0, 0, 2);
@@ -466,16 +494,24 @@ void drawRobotLegs() {
         glPopMatrix();
 
         glPushMatrix();
-            glRotatef(-50, 0.0, 1.0, 0.0);
-            glRotatef(90, 1.0, 0.0, 0.0);
-            glRotatef(-60, 0.0, 1.0, 0.0);
+            if (turnFly == 0) {
+                glRotatef(-50, 0.0, 1.0, 0.0);
+                glRotatef(90, 1.0, 0.0, 0.0);
+                glRotatef(-60, 0.0, 1.0, 0.0);
+            } else {
+                glRotatef(-60, 0.0, 1.0, 0.0);
+                glRotatef(90, 1.0, 0.0, 0.0);
+                glRotatef(-90, 0.0, 1.0, 0.0);
+            }
             glColor3f(0.2, 0.2, 0.2);
             gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
             glTranslatef(0, 0, 2);
             glColor3f(0.8, 0.4, 0.4);
             glutSolidTorus(0.2, 0.1, 100, 100);
 
-            glRotatef(60, 0.0, 1.0, 0.0);
+            if (turnFly == 0) {
+                glRotatef(60, 0.0, 1.0, 0.0);
+            }
             glColor3f(0.0, 0.4, 0.4);
             gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
             glTranslatef(0, 0, 2);
@@ -487,19 +523,30 @@ void drawRobotLegs() {
     // Right Legs
     glPushMatrix();
         glTranslatef(0.5, 0, 0);
-        glRotatef(legRotation, 0.0, 1.0, 0.0);
+
+        if (turnFly == 0) {
+            glRotatef(legRotation, 0.0, 1.0, 0.0);
+        }
 
         glPushMatrix();
-            glRotatef(50, 0.0, 1.0, 0.0);
-            glRotatef(90, 1.0, 0.0, 0.0);
-            glRotatef(60, 0.0, 1.0, 0.0);
+            if (turnFly == 0) {
+                glRotatef(50, 0.0, 1.0, 0.0);
+                glRotatef(90, 1.0, 0.0, 0.0);
+                glRotatef(60, 0.0, 1.0, 0.0);
+            } else {
+                glRotatef(60, 0.0, 1.0, 0.0);
+                glRotatef(90, 1.0, 0.0, 0.0);
+                glRotatef(90, 0.0, 1.0, 0.0);
+            }
             glColor3f(0.2, 0.2, 0.2);
             gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
             glTranslatef(0, 0, 2);
             glColor3f(0.8, 0.4, 0.4);
             glutSolidTorus(0.2, 0.1, 100, 100);
 
-            glRotatef(-60, 0.0, 1.0, 0.0);
+            if (turnFly == 0) {
+                glRotatef(-60, 0.0, 1.0, 0.0);
+            }
             glColor3f(0.0, 0.4, 0.4);
             gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
             glTranslatef(0, 0, 2);
@@ -508,16 +555,24 @@ void drawRobotLegs() {
         glPopMatrix();
 
         glPushMatrix();
-            glRotatef(-50, 0.0, 1.0, 0.0);
-            glRotatef(90, 1.0, 0.0, 0.0);
-            glRotatef(60, 0.0, 1.0, 0.0);
+            if (turnFly == 0) {
+                glRotatef(-50, 0.0, 1.0, 0.0);
+                glRotatef(90, 1.0, 0.0, 0.0);
+                glRotatef(60, 0.0, 1.0, 0.0);
+            } else {
+                glRotatef(-60, 0.0, 1.0, 0.0);
+                glRotatef(90, 1.0, 0.0, 0.0);
+                glRotatef(90, 0.0, 1.0, 0.0);
+            }
             glColor3f(0.2, 0.2, 0.2);
             gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
             glTranslatef(0, 0, 2);
             glColor3f(0.8, 0.4, 0.4);
             glutSolidTorus(0.2, 0.1, 100, 100);
 
-            glRotatef(-60, 0.0, 1.0, 0.0);
+            if (turnFly == 0) {
+                glRotatef(-60, 0.0, 1.0, 0.0);
+            }
             glColor3f(0.0, 0.4, 0.4);
             gluCylinder(quadric, 0.2, 0.2, 2, 100, 100);
             glTranslatef(0, 0, 2);
@@ -544,7 +599,7 @@ void drawRobotArms() {
           glRotatef(legRotation, 1.0, 0.0, 0.0);
 
           glColor3f(0.2, 0.2, 0.2);
-          glutSolidSphere(0.3, 100,   100);
+          glutSolidSphere(0.3, 100, 100);
           glColor3f(0.6, 0.8, 0.6);
           gluCylinder(quadric, 0.1, 0.1, 1, 100, 100);
 
@@ -616,6 +671,10 @@ void drawRobotBody() {
 
         glColor3f(0.8, 0.3, 0.4);
         gluCylinder(quadric, 0.1, 0.2, 0.8, 100, 100);
+        if (turnFly > 0) {
+            glColor3f(0.8, 0.0, 0.0);
+            glutSolidCone(0.1, 1.5, 10, 10);
+        }
     glPopMatrix();
 
     glPushMatrix();
@@ -624,6 +683,10 @@ void drawRobotBody() {
 
         glColor3f(0.8, 0.3, 0.4);
         gluCylinder(quadric, 0.1, 0.2, 0.8, 100, 100);
+        if (turnFly > 0) {
+            glColor3f(0.8, 0.0, 0.0);
+            glutSolidCone(0.1, 1.5, 10, 10);
+        }
     glPopMatrix();
 
     glTranslatef(0.0f, 0.0f, -0.5f);
@@ -689,9 +752,30 @@ void drawRobotHead() {
 
 void drawRobot() {
     glRotatef(robotAngle, 0.0, 1.0, 0.0);
+    if (turnFly > 0) {
+      glRotatef(-25, 1.0, 0.0, 0.0);
+
+      if (fly < Scale) {
+        fly += 1;
+      }
+    } else {
+      if (fly > 0) {
+        fly = 0;
+      }
+    }
 
     glTranslatef(0.0, 3.2, 0.0);
-    drawRobotLegs();
+
+    glPushMatrix();
+        if (turnFly > 0) {
+            glRotatef(bottonSpin, 0, 1, 0);
+            bottonSpin += 6;
+        } else {
+            bottonSpin = 0;
+        }
+        drawRobotLegs();
+    glPopMatrix();
+
     drawRobotBody();
     drawRobotArms();
 
@@ -719,7 +803,7 @@ void drawTable() {
     gluQuadricOrientation(quadric, GLU_OUTSIDE);
     gluQuadricNormals(quadric, GLU_SMOOTH);
 
-    
+
     glRotatef(45, 0, 1, 0);
 
     glPushMatrix();
@@ -819,6 +903,7 @@ void drawFountain() {
 
     glPopMatrix();
 }
+
 void applyLights() {
   ////////////////////////////////////////////////
   //////////////////  First Light ////////////////
@@ -859,7 +944,7 @@ GLuint loadTex(unsigned char *Imagem, unsigned int ih,unsigned int iw) {
 
 
 
- 
+
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -867,10 +952,10 @@ GLuint loadTex(unsigned char *Imagem, unsigned int ih,unsigned int iw) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    
+
     glEnable(GL_TEXTURE_2D);
     return textureId;
-   
+
 }
 
 void drawTexture(void) {
@@ -887,7 +972,7 @@ void drawTexture(void) {
     imagem = loadBMP_custom("mesa.bmp", iw, ih);
     texnum[2]  = loadTex(imagem, ih, iw);
 
-    imagem = loadBMP_custom("floorn.bmp", iw, ih);
+    imagem = loadBMP_custom("floor.bmp", iw, ih);
     texnum[3]  = loadTex(imagem, ih, iw);
 
     delete imagem;
@@ -910,7 +995,7 @@ void draw(void) {
     if (changeCamera == 0) {
         gluLookAt(-2*Scale,150 + cameraAngle,-10*Scale, -2*Scale,0,-5*Scale, 0,1,0);
   	} else if (changeCamera == 1) {
-        gluLookAt(cameraX,20 + cameraAngle,cameraZ, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+        gluLookAt(cameraX,20 + cameraAngle,cameraZ, robotWalkingSide,fly,robotWalkingUp, 0,1,0);
     } else if (changeCamera == 2) {
         gluLookAt(-2*Scale,10 + cameraAngle,-Scale + 1, -4*Scale,4,-Scale, 0,1,0);
     } else if (changeCamera == 3) {
@@ -920,13 +1005,13 @@ void draw(void) {
     } else if (changeCamera == 5) {
         gluLookAt(8*Scale,10 + cameraAngle,-3*Scale, 10*Scale,3,-3*Scale, 0,1,0);
     } else if (changeCamera == 6) {
-        gluLookAt(robotWalkingSide, 20 + cameraAngle,robotWalkingUp-10, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+        gluLookAt(robotWalkingSide, 20 + cameraAngle + fly,robotWalkingUp-10, robotWalkingSide,fly,robotWalkingUp, 0,1,0);
     } else if (changeCamera == 7) {
-        gluLookAt(robotWalkingSide+10, 20 + cameraAngle,robotWalkingUp, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+        gluLookAt(robotWalkingSide+10, 20 + cameraAngle + fly,robotWalkingUp, robotWalkingSide,fly,robotWalkingUp, 0,1,0);
     } else if (changeCamera == 8) {
-        gluLookAt(robotWalkingSide-10, 20 + cameraAngle,robotWalkingUp, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+        gluLookAt(robotWalkingSide-10, 20 + cameraAngle + fly,robotWalkingUp, robotWalkingSide,fly,robotWalkingUp, 0,1,0);
     } else if (changeCamera == 9) {
-        gluLookAt(robotWalkingSide, 20 + cameraAngle,robotWalkingUp+10, robotWalkingSide,0,robotWalkingUp, 0,1,0);
+        gluLookAt(robotWalkingSide, 20 + cameraAngle + fly,robotWalkingUp+10, robotWalkingSide,fly,robotWalkingUp, 0,1,0);
     }
 
     applyLights();
@@ -977,7 +1062,7 @@ void draw(void) {
 
     glTranslatef(0.0, -Scale/2, -2*Scale);
 
-    glTranslatef(robotWalkingSide, 0, robotWalkingUp);
+    glTranslatef(robotWalkingSide, fly, robotWalkingUp);
     drawRobot();
 
     // Executa os comandos OpenGL
@@ -985,9 +1070,9 @@ void draw(void) {
     glutSwapBuffers();
 
     if (robotWalkingUp > (-1*Scale)) {
-	    robotWalkingUp -= 0.5;
+	      robotWalkingUp -= 0.5;
         cameraZ -= 0.5;
-	} else if ((robotWalkingUp == (-1*Scale)) && (robotWalkingSide > (-3*Scale))) {
+	  } else if ((robotWalkingUp == (-1*Scale)) && (robotWalkingSide > (-3*Scale))) {
         if (robotAngle < 90) {
             robotAngle += 6;
             legRotation = 0;
@@ -997,7 +1082,7 @@ void draw(void) {
             robotWalkingSide -= 0.5;
             cameraX -= 0.5;
         }
-	} else if ((robotWalkingUp <= (-1*Scale) && robotWalkingUp > (-3*Scale)) && (robotWalkingSide == (-3*Scale))) {
+	  } else if ((robotWalkingUp <= (-1*Scale) && robotWalkingUp > (-3*Scale)) && (robotWalkingSide == (-3*Scale))) {
         if (robotAngle > 0) {
             robotAngle -= 6;
             legRotation = 0;
@@ -1007,7 +1092,7 @@ void draw(void) {
             robotWalkingUp -= 0.5;
             cameraZ -= 0.5;
         }
-	} else if ((robotWalkingUp == (-3*Scale)) && (robotWalkingSide < Scale)) {
+	 } else if ((robotWalkingUp == (-3*Scale)) && (robotWalkingSide < Scale)) {
         if (robotAngle > -90) {
             robotAngle -= 6;
             legRotation = 0;
@@ -1057,9 +1142,9 @@ void redraw(int) {
 }
 
 void keyPressed(unsigned char key, int x, int y) {
-	if (key == 'c') {
+	  if (key == 'c' or key == 'C') {
         cameraAngle = 0;
-		changeCamera++;
+		    changeCamera++;
         if (changeCamera == 10) {
             changeCamera = 0;
         }
@@ -1071,6 +1156,10 @@ void keyPressed(unsigned char key, int x, int y) {
 
     if (key == '-') {
         cameraAngle += 1;
+    }
+
+    if (key == 'f' or key == 'F') {
+        turnFly = (turnFly == 1) ? 0 : 1;
     }
 
     if (key == '0' or key == '1' or key == '2' or key == '3' or key == '4' or key == '5' or key == '6' or key == '7' or key == '8' or key == '9') {
