@@ -11,7 +11,8 @@
 #include <stdio.h>
 #include <math.h>
 #include "BCommandLine.h"
-
+#include <string.h>
+#include <iostream> 
 
 ///////////////////////////////////////////////////
 ///////////////   Texture Consts  /////////////////
@@ -972,7 +973,7 @@ void drawTexture(void) {
     imagem = loadBMP_custom("mesa.bmp", iw, ih);
     texnum[2]  = loadTex(imagem, ih, iw);
 
-    imagem = loadBMP_custom("floor.bmp", iw, ih);
+    imagem = loadBMP_custom("floorn.bmp", iw, ih);
     texnum[3]  = loadTex(imagem, ih, iw);
 
     delete imagem;
@@ -1210,16 +1211,38 @@ void changeWindowSize(GLsizei w, GLsizei h) {
 }
 
 int main(int argc, char **argv) {
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(800, 700);
-    glutInitWindowPosition(10, 10);
-    glutCreateWindow("Study Test");
-    glutTimerFunc(40, redraw, 1);
-    drawTexture();
-    glutDisplayFunc(draw);
-    glutReshapeFunc(changeWindowSize);
-    glutKeyboardFunc(keyPressed);
-    start();
-    glutMainLoop();
+    if (argc > 1 && strcmp(argv[1], "-help") == 0) {
+    std::cout << std::endl;
+    std::cout << std::endl;    
+    std::cout << "\t///////////////////////////////////////////////////" << std::endl;
+    std::cout << "\t//////              COMANDOS                ///////" << std::endl;
+    std::cout << "\t///////////////////////////////////////////////////" << std::endl;
+    std::cout << "\t//////              Cameras:                ///////" << std::endl;    
+    std::cout << "\t/////  Todas as cameras do programa, 0 a 9   //////" << std::endl;
+    std::cout << "\t/////  0 - Camera acima do labirinto         //////" << std::endl;
+    std::cout << "\t/////  1 - Camera que segue o robo           //////" << std::endl;
+    std::cout << "\t/////  2 a 5 - Camera dos objetos            //////" << std::endl;
+    std::cout << "\t/////  6 a 9 - Cameras ao redor do robo      //////" << std::endl;
+    std::cout << "\t/////  'c' ou 'C' para alternar as cameras   //////" << std::endl;
+    std::cout << "\t///////////////////////////////////////////////////" << std::endl;
+    std::cout << "\t//////              Especial:                //////" << std::endl;
+    std::cout << "\t////// 'f' ou 'F' para modo Voo              //////" << std::endl;
+    std::cout << "\t///////////////////////////////////////////////////" << std::endl; 
+    std::cout << std::endl;
+    std::cout << std::endl;
+    
+    } else {
+        glutInit(&argc, argv);
+        glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+        glutInitWindowSize(800, 700);
+        glutInitWindowPosition(10, 10);
+        glutCreateWindow("Study Test");
+        glutTimerFunc(40, redraw, 1);
+        drawTexture();
+        glutDisplayFunc(draw);
+        glutReshapeFunc(changeWindowSize);
+        glutKeyboardFunc(keyPressed);
+        start();
+        glutMainLoop();
+    }
 }
