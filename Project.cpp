@@ -942,11 +942,6 @@ GLuint loadTex(unsigned char *Imagem, unsigned int ih,unsigned int iw) {
 	  glBindTexture (GL_TEXTURE_2D,textureId);
 	  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, iw, ih, 0,GL_RGB, GL_UNSIGNED_BYTE, Imagem);
 	  gluBuild2DMipmaps(textureId, GL_RGB, iw, ih, GL_RGB, GL_UNSIGNED_BYTE, Imagem);
-
-
-
-
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1224,6 +1219,7 @@ int main(int argc, char **argv) {
     std::cout << "\t/////  2 a 5 - Camera dos objetos            //////" << std::endl;
     std::cout << "\t/////  6 a 9 - Cameras ao redor do robo      //////" << std::endl;
     std::cout << "\t/////  'c' ou 'C' para alternar as cameras   //////" << std::endl;
+    std::cout << "\t/////  '+' ou '-' altera o zoom nas cameras  //////" << std::endl;
     std::cout << "\t///////////////////////////////////////////////////" << std::endl;
     std::cout << "\t//////              Especial:                //////" << std::endl;
     std::cout << "\t////// 'f' ou 'F' para modo Voo              //////" << std::endl;
